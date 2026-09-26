@@ -5,7 +5,7 @@ export function PageHeader({ kicker, title, children }: { kicker?: string; title
     <div className="mb-8">
       {kicker && <p className="kicker mb-2">{kicker}</p>}
       <h1 className="font-display text-3xl uppercase leading-tight tracking-wide sm:text-4xl">{title}</h1>
-      {children && <div className="mt-3 max-w-prose text-[var(--bone-2)]">{children}</div>}
+      {children && <div className="mt-3 max-w-prose text-fg-2">{children}</div>}
     </div>
   );
 }
@@ -17,11 +17,11 @@ export function Panel({ children, className = '' }: { children: ReactNode; class
 type Tone = 'error' | 'success' | 'info';
 
 export function Notice({ tone = 'info', children }: { tone?: Tone; children: ReactNode }) {
-  const border = tone === 'error' ? 'border-blood' : tone === 'success' ? 'border-cash' : 'border-gold';
+  const border = tone === 'error' ? 'border-red' : tone === 'success' ? 'border-ok' : 'border-teal';
   return (
     <div
       role={tone === 'error' ? 'alert' : 'status'}
-      className={`mb-5 border-l-4 ${border} bg-ink-3 px-4 py-3 text-sm leading-relaxed text-bone`}
+      className={`mb-5 border-l-4 ${border} bg-casing px-4 py-3 text-sm leading-relaxed text-fg`}
     >
       {children}
     </div>
@@ -40,7 +40,7 @@ export function Field({ label, hint, error, ...input }: FieldProps) {
   const errorId = error ? `${id}-error` : undefined;
   return (
     <div className="mb-5">
-      <label htmlFor={id} className="mb-2 block font-display text-xs uppercase tracking-widest text-bone-2">
+      <label htmlFor={id} className="mb-2 block font-display text-xs uppercase tracking-widest text-fg-2">
         {label}
       </label>
       <input
@@ -51,12 +51,12 @@ export function Field({ label, hint, error, ...input }: FieldProps) {
         {...input}
       />
       {hint && (
-        <p id={hintId} className="mt-2 text-sm text-[var(--muted)]">
+        <p id={hintId} className="mt-2 text-sm text-fg-3">
           {hint}
         </p>
       )}
       {error && (
-        <p id={errorId} className="mt-2 text-sm text-[#ff8a7f]">
+        <p id={errorId} className="mt-2 text-sm text-red-text">
           {error}
         </p>
       )}
@@ -72,7 +72,7 @@ export function TextArea({ label, ...rest }: TextAreaProps) {
   const id = useId();
   return (
     <div className="mb-5">
-      <label htmlFor={id} className="mb-2 block font-display text-xs uppercase tracking-widest text-bone-2">
+      <label htmlFor={id} className="mb-2 block font-display text-xs uppercase tracking-widest text-fg-2">
         {label}
       </label>
       <textarea id={id} className="field-input py-3" rows={4} {...rest} />

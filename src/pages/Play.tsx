@@ -26,12 +26,12 @@ function PlayButton({ game }: { game: Game }) {
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <button type="button" className="btn cash" onClick={launch} disabled={busy}>
+    <div className="flex w-full flex-col gap-2">
+      <button type="button" className="btn primary w-full" onClick={launch} disabled={busy}>
         {busy ? 'Launching…' : `Play ${game.name}`}
       </button>
       {error && (
-        <p role="alert" className="text-sm text-[#ff8a7f]">
+        <p role="alert" className="text-sm text-red-text">
           {error}
         </p>
       )}
@@ -62,11 +62,11 @@ function VerifyBanner() {
       {sent ? (
         'A new link is on its way.'
       ) : (
-        <button type="button" className="font-semibold text-gold underline" onClick={resend}>
+        <button type="button" className="font-semibold text-red-text underline" onClick={resend}>
           Send it again
         </button>
       )}
-      {error && <span className="ml-2 text-[#ff8a7f]">{error}</span>}
+      {error && <span className="ml-2 text-red-text">{error}</span>}
     </Notice>
   );
 }
@@ -109,7 +109,7 @@ export default function Play() {
                     key={g.slug}
                     game={g}
                     action={
-                      <Link to={`/schedule/${g.slug}`} className="btn gold">
+                      <Link to={`/schedule/${g.slug}`} className="btn ghost w-full">
                         See sessions
                       </Link>
                     }

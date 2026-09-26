@@ -1,17 +1,20 @@
 import { useEffect, type ReactNode } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
+import Faux from './Faux';
 
 function Wordmark() {
   return (
-    <Link to="/" className="font-display text-lg uppercase tracking-wider text-bone no-underline sm:text-2xl">
-      Game<span className="text-blood">tronyx</span>
+    <Link to="/" className="flex min-h-[44px] items-center" aria-label="Gametronyx home">
+      <img src="/brand/gametronyx-logo.webp" alt="" width={1200} height={224} className="h-5 w-auto sm:h-7" />
     </Link>
   );
 }
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
-  `font-display text-[11px] uppercase tracking-wider no-underline sm:text-xs sm:tracking-widest ${isActive ? 'text-gold' : 'text-bone hover:text-gold'}`;
+  `flex min-h-[44px] items-center px-2 font-display text-[15px] uppercase tracking-wide no-underline focus-visible:outline-amber sm:text-base ${
+    isActive ? 'text-amber' : 'text-fg-inverse hover:text-amber'
+  }`;
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { status, user } = useAuth();
@@ -23,10 +26,10 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b border-ink-3">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4">
+      <header className="bg-char">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-1">
           <Wordmark />
-          <nav aria-label="Main" className="flex items-center gap-3 sm:gap-5">
+          <nav aria-label="Main" className="flex items-center sm:gap-2">
             {status === 'authed' && user ? (
               <>
                 <NavLink to="/play" className={navClass}>
@@ -36,19 +39,19 @@ export default function Layout({ children }: { children: ReactNode }) {
                   Schedule
                 </NavLink>
                 {user.role === 'admin' && (
-                  <NavLink to="/admin" className={(state) => `${navClass(state)} hidden sm:inline`}>
+                  <NavLink to="/admin" className={(state) => `${navClass(state)} hidden sm:flex`}>
                     Admin
                   </NavLink>
                 )}
                 <NavLink
                   to="/me"
-                  className={(state) => `${navClass(state)} inline-block max-w-[10rem] truncate align-middle`}
+                  className={(state) => `${navClass(state)} max-w-[10rem]`}
                   title={`Your account (${user.username})`}
                   aria-label={`Your account (${user.username})`}
                 >
-                  {/* Phones: three links plus the wordmark leave no room for a name. */}
+                  {/* Phones: three links plus the logo leave no room for a name. */}
                   <span className="sm:hidden">Me</span>
-                  <span className="hidden sm:inline">{user.username}</span>
+                  <span className="hidden truncate sm:inline">{user.username}</span>
                 </NavLink>
               </>
             ) : status === 'anon' ? (
@@ -58,12 +61,18 @@ export default function Layout({ children }: { children: ReactNode }) {
             ) : null}
           </nav>
         </div>
+        <div className="stripe" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
       </header>
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:py-12">{children}</main>
 
-      <footer className="border-t border-ink-3">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-6 text-sm text-[var(--muted)]">
+      <footer className="border-t border-line bg-casing">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-6 text-sm text-fg-3">
+          <Faux text="Quality mark · GT works" className="font-mono text-xs tracking-[0.12em]" />
           <span>© Tyler Bielman</span>
           <Link to="/privacy">Privacy</Link>
           <a href="https://noeasywayup.com/" target="_blank" rel="noreferrer">

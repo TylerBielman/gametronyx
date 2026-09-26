@@ -6,10 +6,10 @@ import { useAction, useAdmin } from './useAdmin';
 function Status({ ok, label, fix }: { ok: boolean; label: string; fix: string }) {
   return (
     <li className="flex items-start gap-2 text-sm">
-      <span className={ok ? 'text-cash' : 'text-[#ff8a7f]'}>{ok ? '✓' : '✗'}</span>
+      <span className={ok ? 'text-ok' : 'text-red-text'}>{ok ? '✓' : '✗'}</span>
       <span>
         {label}
-        {!ok && <span className="block text-[var(--muted)]">{fix}</span>}
+        {!ok && <span className="block text-fg-3">{fix}</span>}
       </span>
     </li>
   );
@@ -44,7 +44,7 @@ export default function Settings() {
 
   const toggle = (k: 'alert_invite_request' | 'alert_playtest_signup' | 'alert_playtest_cancel', label: string) => (
     <label className="mb-3 flex items-center gap-3 text-sm">
-      <input type="checkbox" className="h-5 w-5 accent-[var(--gold)]" checked={s[k]} onChange={(e) => setS({ ...s, [k]: e.target.checked })} />
+      <input type="checkbox" className="h-5 w-5 accent-[var(--red)]" checked={s[k]} onChange={(e) => setS({ ...s, [k]: e.target.checked })} />
       {label}
     </label>
   );

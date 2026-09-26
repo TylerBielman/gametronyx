@@ -54,11 +54,11 @@ function EmailForm() {
           autoComplete="email"
           hint={
             user?.email_verified ? (
-              <span className="text-cash">✓ Confirmed</span>
+              <span className="text-ok">✓ Confirmed</span>
             ) : user?.email ? (
               <>
                 Not confirmed yet.{' '}
-                <button type="button" className="font-semibold text-gold underline" onClick={resend}>
+                <button type="button" className="font-semibold text-red-text underline" onClick={resend}>
                   Resend link
                 </button>
               </>
@@ -105,7 +105,7 @@ function PasswordForm() {
   return (
     <Panel className="mb-6">
       <h2 className="mb-1 font-display text-lg uppercase tracking-wide">Password</h2>
-      <p className="mb-4 text-sm text-[var(--muted)]">Also your No Easy Way Up password.</p>
+      <p className="mb-4 text-sm text-fg-3">Also your No Easy Way Up password.</p>
       {note && <Notice tone={note.tone}>{note.text}</Notice>}
       <form onSubmit={submit}>
         <Field label="Current password" type="password" value={current} onChange={(e) => setCurrent(e.target.value)} required autoComplete="current-password" />

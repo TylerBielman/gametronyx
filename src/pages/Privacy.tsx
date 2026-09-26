@@ -34,7 +34,7 @@ export default function Privacy() {
         {SECTIONS.map(([title, body]) => (
           <section key={title}>
             <h2 className="mb-2 font-display text-lg uppercase tracking-wide">{title}</h2>
-            <p className="leading-relaxed text-[var(--bone-2)]">{body}</p>
+            <p className="leading-relaxed text-fg-2">{body}</p>
           </section>
         ))}
       </div>

@@ -57,7 +57,7 @@ function GameForm({ game, onSaved, onCancel }: { game: Partial<AdminGame>; onSav
         />
       </div>
       <div className="mb-5">
-        <label htmlFor={`type-${game.id ?? 'new'}`} className="mb-2 block font-display text-xs uppercase tracking-widest text-bone-2">
+        <label htmlFor={`type-${game.id ?? 'new'}`} className="mb-2 block font-display text-xs uppercase tracking-widest text-fg-2">
           Type
         </label>
         <select id={`type-${game.id ?? 'new'}`} className="field-input" value={g.type} onChange={set('type')}>
@@ -75,7 +75,7 @@ function GameForm({ game, onSaved, onCancel }: { game: Partial<AdminGame>; onSav
         <>
           <Field label="Play URL" type="url" value={g.play_url ?? ''} onChange={set('play_url')} placeholder="https://…" />
           <label className="mb-5 flex items-center gap-3 text-sm">
-            <input type="checkbox" className="h-5 w-5 accent-[var(--gold)]" checked={!!g.handoff_enabled} onChange={(e) => setG({ ...g, handoff_enabled: e.target.checked })} />
+            <input type="checkbox" className="h-5 w-5 accent-[var(--red)]" checked={!!g.handoff_enabled} onChange={(e) => setG({ ...g, handoff_enabled: e.target.checked })} />
             Players launch it from Gametronyx (Play button with login handoff)
           </label>
           <div className="grid gap-x-4 sm:grid-cols-2">
@@ -88,7 +88,7 @@ function GameForm({ game, onSaved, onCancel }: { game: Partial<AdminGame>; onSav
       <Field label="Site link-out URL (optional)" type="url" value={g.site_url ?? ''} onChange={set('site_url')} placeholder="https://…" />
       <div className="grid gap-x-4 sm:grid-cols-2">
         <div className="mb-5">
-          <label htmlFor={`status-${game.id ?? 'new'}`} className="mb-2 block font-display text-xs uppercase tracking-widest text-bone-2">
+          <label htmlFor={`status-${game.id ?? 'new'}`} className="mb-2 block font-display text-xs uppercase tracking-widest text-fg-2">
             Status
           </label>
           <select id={`status-${game.id ?? 'new'}`} className="field-input" value={g.status} onChange={set('status')}>
@@ -100,7 +100,7 @@ function GameForm({ game, onSaved, onCancel }: { game: Partial<AdminGame>; onSav
         <Field label="Sort order" type="number" value={g.sort_order ?? 0} onChange={set('sort_order')} />
       </div>
       <label className="mb-6 flex items-center gap-3 text-sm">
-        <input type="checkbox" className="h-5 w-5 accent-[var(--gold)]" checked={!!g.show_on_showcase} onChange={(e) => setG({ ...g, show_on_showcase: e.target.checked })} />
+        <input type="checkbox" className="h-5 w-5 accent-[var(--red)]" checked={!!g.show_on_showcase} onChange={(e) => setG({ ...g, show_on_showcase: e.target.checked })} />
         Show on the public showcase
       </label>
       <div className="flex gap-3">
@@ -136,7 +136,7 @@ export default function Games() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <span>
                     <strong className="font-display uppercase tracking-wide">{g.name}</strong>
-                    <span className="ml-2 font-mono text-[11px] uppercase text-[var(--muted)]">
+                    <span className="ml-2 font-mono text-[11px] uppercase text-fg-3">
                       {g.type.replace('_', ' ')} · {g.status}
                       {!g.show_on_showcase ? ' · hidden' : ''}
                     </span>

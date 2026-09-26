@@ -18,7 +18,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | U10 | NEWU link | **Hand off login and drop the basic-auth prompt**: players arrive at NEWU logged in, and NEWU's shared browser password is removed |
 | U11 | Feedback popup content | **Free text only**, with a Skip button |
 | U12 | Slot capacity | **Seat cap per slot + waitlist** with automatic promotion |
-| U13 | Look | **Match NEWU** (palette and fonts from `ef-app/src/styles/tokens.css`) |
+| U13 | Look | ~~Match NEWU~~ (superseded by U21 on 2026-09-26) |
 | U14 | Age | **No age check** (invite-only; Tyler vouches for invitees) |
 | U15 | Link-outs | **noeasywayup.com only** for now. Red Ring is shown only as a scheduled-playtest game, not as a link-out |
 | U16 | Scheduling | Use a free existing tool only if it is seamless for players. Research found none that meets the brief, so it is **built in** on the shared API (Cal.com Free was the runner-up; see DESIGN §7) |
@@ -26,6 +26,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | U18 | Repo visibility | Private while building; **public at launch** so GitHub Pages works on the free plan |
 | U19 | NEWU integration (2026-09-26) | **On hold.** No NEWU front-end deploy (it would ship unreleased NEWU work on `main`) and no basic-auth removal (live telemetry depends on it). Gametronyx launches without them; see LAUNCH_CHECKLIST Part G |
 | U20 | Discord (2026-09-26) | Skipped at launch; add the bot token and the server settings later |
+| U21 | Look (2026-09-26) | **The 80s handheld** from the four mockups: an ironic old Eastern-bloc game company, with the catchphrase "We kill your high score in the face!" No real language: decorative text is **faux-Soviet lettering** only. No price stickers over the game art. The A and B keys must make it obvious what to press. Red Ring's card art is Tyler's hand screenshot |
 
 ## Agent calls (for Tyler's review)
 
@@ -63,7 +64,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | A30 | The API keeps NEWU's specific invite errors ("Invalid invite code", "Invite code already used"); the Gametronyx UI shows one generic message | NEWU's client and tests depend on the specific messages |
 | A31 | Fixed a pre-existing bug found while testing: over-size saves and bug reports returned 500 instead of 413 | Separate commit on the same branch; test-provable |
 | A32 | Fonts bundled with the site (Fontsource) instead of Google Fonts | No third-party requests from playtesters' browsers; one less outside dependency |
-| A33 | Primary buttons use NEWU's red (`--blood`); gold is the accent and secondary button color | "Match NEWU" (U13): NEWU's primary buttons are red. Supersedes the spec's original "gold primary" |
+| A33 | ~~Primary buttons use NEWU's red~~ | Superseded by U21 and A45 |
 | A34 | Pages deploy is gated on the `PAGES_ENABLED` repo variable | The repo stays private until launch (U18); CI shouldn't be red meanwhile |
 | A35 | `GET /games` never returns `play_url`; Play goes through the handoff | Keeps the launcher-only gate (U7) meaningful |
 | A36 | Logging out goes through a public `/logout` route | Logging out on a protected page otherwise bounced to `/login?next=…` |
@@ -75,6 +76,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | A42 | A signup waitlisted after the 4-hour mark gets no reminder; one promoted inside 15 minutes gets the Discord email at once | Consistent with A21 |
 | A43 | The server go-live is one root command on the box (`gametronyx-go-live.sh`), with the code staged by the box's own Actions runner | Tyler has no bash or rsync on his desktop. Claude stages; Tyler pulls the trigger (EFdungeon's RED lane) |
 | A44 | Removing NEWU's basic auth needs a telemetry decision first | `POST /api/telemetry` has its own basic auth and relies on browsers holding the playtest credential |
+| A45 | GT-01 details: the signed-out keys are A = Request invite, B = Log in and Start = I have a code; signed in, A = Play, B = Schedule and Start = My account. Faux letters swap A, N, O, R and W only; the key letters use the headline font | Keeps faux words readable; the Start key keeps the invite-code path one tap away |
 
 ## Open items
 None block the design. Values Tyler supplies at setup (DESIGN §12): the Discord server ID and invite, the bot token, the Resend key, the GitHub token, and the GoDaddy DNS records.

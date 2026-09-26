@@ -19,7 +19,7 @@ function ChannelPicker({ channels, channelsError, value, name, onChange }: {
   if (channels && channels.length) {
     return (
       <div className="mb-5">
-        <label htmlFor="voice-channel" className="mb-2 block font-display text-xs uppercase tracking-widest text-bone-2">
+        <label htmlFor="voice-channel" className="mb-2 block font-display text-xs uppercase tracking-widest text-fg-2">
           Voice channel
         </label>
         <select
@@ -111,7 +111,7 @@ function SlotForm({ slot, games, defaults, onSaved, onCancel }: {
       {note && note.text && <Notice tone={note.tone}>{note.text}</Notice>}
       {!slot && (
         <div className="mb-5">
-          <label htmlFor="slot-game" className="mb-2 block font-display text-xs uppercase tracking-widest text-bone-2">
+          <label htmlFor="slot-game" className="mb-2 block font-display text-xs uppercase tracking-widest text-fg-2">
             Game
           </label>
           <select id="slot-game" className="field-input" value={game} onChange={(e) => setGame(e.target.value)}>
@@ -141,7 +141,7 @@ function SlotForm({ slot, games, defaults, onSaved, onCancel }: {
       <TextArea label="Session notes (in the 15-minute email)" value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={2000} placeholder="e.g. Download the build from #builds first." />
       {!slot && <Field label="Repeat weekly for N more weeks" type="number" min={0} max={12} value={repeat} onChange={(e) => setRepeat(Number(e.target.value))} />}
       <label className="mb-6 flex items-center gap-3 text-sm">
-        <input type="checkbox" className="h-5 w-5 accent-[var(--gold)]" checked={draft} onChange={(e) => setDraft(e.target.checked)} />
+        <input type="checkbox" className="h-5 w-5 accent-[var(--red)]" checked={draft} onChange={(e) => setDraft(e.target.checked)} />
         Draft (hidden from players)
       </label>
       <div className="flex gap-3">
@@ -170,19 +170,19 @@ function Roster({ slot, onClose, onChanged }: { slot: AdminSlot; onClose: () => 
 
   return (
     <Modal title={`Roster · ${slot.game_name}`} onClose={onClose}>
-      <p className="mb-4 text-sm text-[var(--bone-2)]">{whenLabel(slot.starts_at, slot.ends_at)}</p>
+      <p className="mb-4 text-sm text-fg-2">{whenLabel(slot.starts_at, slot.ends_at)}</p>
       {note && note.text && <Notice tone={note.tone}>{note.text}</Notice>}
       {rows === null ? (
         <Spinner />
       ) : live.length === 0 ? (
-        <p className="mb-4 text-sm text-[var(--muted)]">Nobody yet.</p>
+        <p className="mb-4 text-sm text-fg-3">Nobody yet.</p>
       ) : (
-        <ul className="mb-5 divide-y divide-ink-3 border border-ink-3">
+        <ul className="mb-5 divide-y divide-line rounded-lg border border-line bg-paper">
           {live.map((r) => (
             <li key={r.signup_id} className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
               <span>
                 <strong>{r.username}</strong>{' '}
-                <span className="text-[var(--muted)]">
+                <span className="text-fg-3">
                   {r.status === 'confirmed' ? 'seated' : `waitlist #${r.position}`}
                   {r.remind_4h ? ' · reminder' : ''}
                   {r.join_sent_at ? ' · Discord sent' : ''}
@@ -190,7 +190,7 @@ function Roster({ slot, onClose, onChanged }: { slot: AdminSlot; onClose: () => 
               </span>
               <button
                 type="button"
-                className="text-[#ff8a7f] underline"
+                className="text-red-text underline"
                 disabled={busy}
                 onClick={() =>
                   token && run(async () => setRows(await admin.rosterRemove(token, slot.id, r.signup_id)), `Removed ${r.username}.`).then((ok) => ok && onChanged())
@@ -245,7 +245,7 @@ export default function Slots() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-4 text-sm">
           {(['upcoming', 'past'] as const).map((w) => (
-            <button key={w} type="button" className={when === w ? 'font-semibold text-gold' : 'text-bone underline'} onClick={() => setWhen(w)}>
+            <button key={w} type="button" className={when === w ? 'font-semibold text-red-text' : 'text-fg underline'} onClick={() => setWhen(w)}>
               {w === 'upcoming' ? 'Upcoming' : 'Past'}
             </button>
           ))}
@@ -277,16 +277,16 @@ export default function Slots() {
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <span>
                       <strong className="font-display uppercase tracking-wide">{s.game_name}</strong>
-                      <span className="block text-sm text-[var(--bone-2)]">
+                      <span className="block text-sm text-fg-2">
                         {whenLabel(s.starts_at, s.ends_at)} · {lengthLabel(s.duration_min)}
                       </span>
-                      <span className="block text-sm text-[var(--muted)]">
+                      <span className="block text-sm text-fg-3">
                         {s.confirmed_count}/{s.capacity} seated · {s.waitlist_count} waiting
                         {s.discord_channel_name ? ` · #${s.discord_channel_name}` : ''}
                         {s.discord_sync_needed ? ' · Discord event pending retry' : ''}
                       </span>
                     </span>
-                    <span className="font-mono text-[11px] uppercase text-gold">{s.status}</span>
+                    <span className="font-mono text-[11px] uppercase text-red-text">{s.status}</span>
                   </div>
                   {when === 'upcoming' && (
                     <div className="mt-3 flex flex-wrap gap-2">

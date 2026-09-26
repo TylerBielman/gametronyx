@@ -8,7 +8,7 @@ function Copy({ text }: { text: string }) {
   return (
     <button
       type="button"
-      className="font-mono text-xs text-gold underline"
+      className="font-mono text-xs text-red-text underline"
       onClick={() => navigator.clipboard?.writeText(text).then(() => setCopied(true))}
     >
       {copied ? 'copied' : 'copy'}
@@ -42,8 +42,8 @@ export default function Codes() {
       <div className="mb-8 grid gap-6 md:grid-cols-2">
         <Panel>
           <h2 className="mb-2 font-display text-lg uppercase tracking-wide">Master code</h2>
-          <p className="mb-4 text-sm text-[var(--bone-2)]">Always works, for any number of people, on Gametronyx and No Easy Way Up.</p>
-          <p className="mb-4 flex items-center gap-3 font-mono text-xl tracking-widest text-gold">
+          <p className="mb-4 text-sm text-fg-2">Always works, for any number of people, on Gametronyx and No Easy Way Up.</p>
+          <p className="mb-4 flex items-center gap-3 font-mono text-xl tracking-widest text-red-text">
             {master?.code ?? '—'} {master && <Copy text={master.code} />}
           </p>
           <form
@@ -61,7 +61,7 @@ export default function Codes() {
         </Panel>
         <Panel>
           <h2 className="mb-2 font-display text-lg uppercase tracking-wide">One-off codes</h2>
-          <p className="mb-4 text-sm text-[var(--bone-2)]">Each works once and never expires.</p>
+          <p className="mb-4 text-sm text-fg-2">Each works once and never expires.</p>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -89,9 +89,9 @@ export default function Codes() {
         </Panel>
       </div>
       <div className="mb-3 flex items-center gap-4 text-sm">
-        <span className="font-display text-xs uppercase tracking-widest text-bone-2">Show</span>
+        <span className="font-display text-xs uppercase tracking-widest text-fg-2">Show</span>
         {(['unused', 'all'] as const).map((f) => (
-          <button key={f} type="button" className={filter === f ? 'font-semibold text-gold' : 'text-bone underline'} onClick={() => setFilter(f)}>
+          <button key={f} type="button" className={filter === f ? 'font-semibold text-red-text' : 'text-fg underline'} onClick={() => setFilter(f)}>
             {f === 'unused' ? 'Unused' : 'All'}
           </button>
         ))}
@@ -99,13 +99,13 @@ export default function Codes() {
       {data === null ? (
         <Spinner />
       ) : (
-        <ul className="divide-y divide-ink-3 border border-ink-3">
+        <ul className="divide-y divide-line rounded-lg border border-line bg-paper">
           {listed.map((c) => (
             <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm">
               <span>
-                <span className="font-mono text-base text-bone">{c.code}</span> <Copy text={c.code} />
-                <span className="ml-2 font-mono text-[11px] uppercase text-[var(--muted)]">{STATUS[c.status]}</span>
-                <span className="block text-[var(--muted)]">
+                <span className="font-mono text-base text-fg">{c.code}</span> <Copy text={c.code} />
+                <span className="ml-2 font-mono text-[11px] uppercase text-fg-3">{STATUS[c.status]}</span>
+                <span className="block text-fg-3">
                   {c.note ?? ''}
                   {c.redeemed_by_username ? ` · used by ${c.redeemed_by_username} ${shortDate(c.redeemed_at)}` : ''}
                 </span>
@@ -113,7 +113,7 @@ export default function Codes() {
               {c.status === 'unused' && (
                 <button
                   type="button"
-                  className="text-sm text-[#ff8a7f] underline"
+                  className="text-sm text-red-text underline"
                   onClick={() => token && run(() => admin.revoke(token, c.id), `Revoked ${c.code}.`).then((ok) => ok && reload())}
                 >
                   Revoke
@@ -121,7 +121,7 @@ export default function Codes() {
               )}
             </li>
           ))}
-          {listed.length === 0 && <li className="px-4 py-3 text-sm text-[var(--muted)]">None.</li>}
+          {listed.length === 0 && <li className="px-4 py-3 text-sm text-fg-3">None.</li>}
         </ul>
       )}
     </>

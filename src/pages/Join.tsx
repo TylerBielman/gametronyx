@@ -108,7 +108,7 @@ export default function Join() {
             <button type="submit" className="btn primary w-full" disabled={busy || !code.trim()}>
               {busy ? 'Checking…' : 'Continue'}
             </button>
-            <p className="mt-5 text-sm text-[var(--muted)]">
+            <p className="mt-5 text-sm text-fg-3">
               No code? <Link to="/request-invite">Request an invite</Link>.
             </p>
           </form>
@@ -150,13 +150,13 @@ export default function Join() {
               autoComplete="new-password"
               error={confirmError}
             />
-            <p className="mb-5 text-sm text-[var(--muted)]">
+            <p className="mb-5 text-sm text-fg-3">
               By creating an account you agree to the <Link to="/privacy">privacy notice</Link>.
             </p>
             <button type="submit" className="btn primary w-full" disabled={busy}>
               {busy ? 'Creating…' : 'Create account'}
             </button>
-            <button type="button" className="mt-4 w-full text-sm text-[var(--muted)] underline" onClick={() => setStep(1)}>
+            <button type="button" className="mt-4 w-full text-sm text-fg-3 underline" onClick={() => setStep(1)}>
               Use a different code
             </button>
           </form>

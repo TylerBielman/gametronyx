@@ -49,7 +49,7 @@ export function ScheduleMenu() {
               key={g.slug}
               game={g}
               action={
-                <Link to={`/schedule/${g.slug}`} className="btn gold">
+                <Link to={`/schedule/${g.slug}`} className="btn gold w-full">
                   {slots === null
                     ? 'See sessions'
                     : upcoming(g.slug) === 1
@@ -68,13 +68,13 @@ export function ScheduleMenu() {
 function SeatLine({ slot }: { slot: Slot }) {
   if (slot.seats_left > 0) {
     return (
-      <span className="text-cash">
+      <span className="text-ok">
         {slot.seats_left} of {slot.capacity} seats left
       </span>
     );
   }
   return (
-    <span className="text-gold">
+    <span className="text-red-text">
       Full · waitlist{slot.waitlist_count ? ` (${slot.waitlist_count} ahead)` : ''}
     </span>
   );
@@ -123,10 +123,10 @@ function ConfirmSheet({ slot, onClose, onDone }: { slot: Slot; onClose: () => vo
   return (
     <Modal title={slot.seats_left > 0 ? 'Grab this seat?' : 'Join the waitlist?'} onClose={onClose}>
       {error && <Notice tone="error">{error}</Notice>}
-      <dl className="mb-5 space-y-1 text-[var(--bone-2)]">
+      <dl className="mb-5 space-y-1 text-fg-2">
         <div>
           <dt className="sr-only">Game</dt>
-          <dd className="font-display text-lg uppercase text-bone">{slot.game_name}</dd>
+          <dd className="font-display text-lg uppercase text-fg">{slot.game_name}</dd>
         </div>
         <div>
           <dt className="sr-only">When</dt>
@@ -140,7 +140,7 @@ function ConfirmSheet({ slot, onClose, onDone }: { slot: Slot; onClose: () => vo
       <label className="mb-6 flex cursor-pointer items-start gap-3">
         <input
           type="checkbox"
-          className="mt-1 h-5 w-5 accent-[var(--gold)]"
+          className="mt-1 h-5 w-5 accent-[var(--red)]"
           checked={remind}
           onChange={(e) => setRemind(e.target.checked)}
         />
@@ -178,7 +178,7 @@ export function GameSchedule() {
       <PageHeader kicker="Scheduled playtest" title={game?.name ?? mine[0]?.game_name ?? 'Sessions'}>
         {game?.pitch}
       </PageHeader>
-      <p className="mb-6 text-sm text-[var(--muted)]">
+      <p className="mb-6 text-sm text-fg-3">
         Times are shown in your time zone. <Link to="/schedule">All games</Link> · <Link to="/me">My sessions</Link>
       </p>
       {done && <Notice tone="success">{done}</Notice>}
@@ -191,13 +191,13 @@ export function GameSchedule() {
         <div className="space-y-8">
           {days.map((group) => (
             <section key={group[0].id} aria-label={dayLabel(group[0].starts_at)}>
-              <h2 className="mb-3 font-display text-lg uppercase tracking-wide text-gold">{dayLabel(group[0].starts_at)}</h2>
+              <h2 className="mb-3 font-display text-lg uppercase tracking-wide text-red-text">{dayLabel(group[0].starts_at)}</h2>
               <ul className="space-y-3">
                 {group.map((slot) => (
                   <li key={slot.id} className="panel flex flex-wrap items-center justify-between gap-4 p-4">
                     <div>
-                      <p className="font-mono text-base text-bone">{timeRange(slot.starts_at, slot.ends_at)}</p>
-                      <p className="text-sm text-[var(--bone-2)]">
+                      <p className="font-mono text-base text-fg">{timeRange(slot.starts_at, slot.ends_at)}</p>
+                      <p className="text-sm text-fg-2">
                         {lengthLabel(slot.duration_min)} · <SeatLine slot={slot} />
                       </p>
                     </div>

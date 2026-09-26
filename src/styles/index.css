@@ -2,96 +2,136 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Palette and type from No Easy Way Up (ef-app/src/styles/tokens.css),
-   so the two sites read as one family (DESIGN §4.4). */
+/* The GT-01 handheld (DESIGN §4.4): an ironic 80s Eastern-bloc games bureau.
+   Beige plastic, paper manuals, a charcoal bezel, a red A key and an LCD.
+   Text pairs are checked to WCAG AA (4.5:1) on every surface they sit on. */
 :root {
-  --ink: #17140f;
-  --ink-2: #221d16;
-  --ink-3: #2e2820;
-  --bone: #f2ebdb;
-  --bone-2: #e6ddc6;
-  --bone-3: #d2c6a6;
-  --blood: #c2392e;
-  --blood-deep: #8f261c;
-  --gold: #e8b84a;
-  --cash: #4fb36a;
-  --cash-deep: #2f7e47;
-  --muted: #b3a88d; /* bone-3 dimmed for secondary text: 7.8:1 on --ink, 6.2:1 on --ink-3 */
-  color-scheme: dark;
+  --page: #cfc8b6; /* plastic */
+  --casing: #e6e0cf; /* the device shell, raised plastic */
+  --paper: #f1ecdf; /* manual pages, panels */
+  --field: #fbf8f0; /* inputs */
+  --line: #a9a18b;
+  --line-2: #7d7663; /* input borders: 4.3:1 on --field */
+  --char: #262521; /* bezel, header, dark keys */
+  --char-2: #2d2c28;
+  --char-3: #3a3934;
+  --fg: #262521;
+  --fg-2: #45413a;
+  --fg-3: #57524a; /* 4.6:1 on --page */
+  --fg-inverse: #ece6d6;
+  --red: #bf3a1b; /* buttons with light text: 5.2:1 */
+  --red-deep: #9a3016;
+  --red-key: #d8431f; /* the A key itself, decoration only */
+  --red-text: #922b14; /* 4.9:1 on --page */
+  --amber: #f2a33a;
+  --teal: #1fb3b8;
+  --teal-text: #0e5a5d;
+  --lcd: #a6b389;
+  --lcd-ink: #26301b;
+  --lcd-dim: #36432a;
+  --ok: #2c5217;
+  --ok-bg: #d7e2bf;
+  color-scheme: light;
+}
+
+html {
+  font-size: 17px; /* PT Sans Narrow runs small */
 }
 
 html,
 body {
   margin: 0;
   min-height: 100%;
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(194, 57, 46, 0.1), transparent 60%),
-    radial-gradient(ellipse at 50% 100%, rgba(232, 184, 74, 0.06), transparent 60%),
-    var(--ink);
-  background-attachment: fixed;
-  color: var(--bone);
-  font-family: Archivo, system-ui, sans-serif;
-  font-weight: 500;
+  background: var(--page);
+  color: var(--fg);
+  font-family: 'PT Sans Narrow', 'Arial Narrow', system-ui, sans-serif;
   -webkit-text-size-adjust: 100%;
 }
 
 :focus-visible {
-  outline: 3px solid var(--gold);
+  outline: 3px solid var(--red-deep);
   outline-offset: 2px;
 }
 
 a {
-  color: var(--gold);
+  color: var(--red-text);
   text-underline-offset: 3px;
 }
 
 @layer components {
-  /* NEWU's slanted button, same classes and variants. */
+  /* Pill keys, like the cartridge buttons on the GT-01. */
   .btn {
     @apply inline-flex items-center justify-center gap-2 font-display uppercase no-underline;
+    font-weight: 700;
     letter-spacing: 0.06em;
-    padding: 14px 24px;
+    padding: 12px 24px;
     border: none;
-    color: var(--bone);
-    background: var(--ink-3);
+    border-radius: 999px;
+    color: var(--fg-inverse);
+    background: var(--char-2);
+    box-shadow: 0 3px 0 #11100e;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 1.05rem;
     min-height: 48px;
-    clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
-    transition: transform 120ms ease, background 120ms ease;
+    transition: transform 100ms ease, box-shadow 100ms ease, background 100ms ease;
   }
-  .btn:hover { transform: translateY(-2px); background: var(--ink-2); }
-  .btn:active { transform: translateY(0); }
-  .btn.primary { background: var(--blood); color: var(--bone); }
-  .btn.primary:hover { background: var(--blood-deep); }
-  .btn.gold { background: var(--gold); color: var(--ink); }
-  .btn.gold:hover { background: #d9a53a; }
-  .btn.cash { background: var(--cash); color: var(--ink); }
-  .btn.cash:hover { background: var(--cash-deep); color: var(--bone); }
-  .btn.ghost { background: transparent; box-shadow: inset 0 0 0 2px var(--bone-3); color: var(--bone); clip-path: none; }
-  .btn.ghost:hover { background: var(--bone-3); color: var(--ink); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn:hover { background: var(--char-3); }
+  .btn:active { transform: translateY(3px); box-shadow: 0 0 0 #11100e; }
+  .btn.primary { background: var(--red); color: #fff8ec; box-shadow: 0 3px 0 #6e2210; }
+  .btn.primary:hover { background: var(--red-deep); }
+  .btn.primary:active { box-shadow: 0 0 0 #6e2210; }
+  .btn.gold { background: var(--amber); color: var(--char); box-shadow: 0 3px 0 #a86a19; }
+  .btn.gold:hover { background: #e3932a; }
+  .btn.gold:active { box-shadow: 0 0 0 #a86a19; }
+  .btn.cash { background: var(--lcd); color: var(--lcd-ink); box-shadow: 0 3px 0 #6f7d57; }
+  .btn.cash:hover { background: #98a67b; }
+  .btn.cash:active { box-shadow: 0 0 0 #6f7d57; }
+  .btn.ghost { background: transparent; box-shadow: inset 0 0 0 2px var(--char); color: var(--fg); }
+  .btn.ghost:hover { background: var(--char); color: var(--fg-inverse); }
+  .btn.ghost:active { transform: none; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
+  /* A page from the operating manual. */
   .panel {
     @apply relative;
-    background: var(--ink-2);
-    border: 1px solid var(--ink-3);
-    box-shadow: 4px 4px 0 #0c0a07;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 3px 0 var(--line);
   }
 
   .field-input {
-    @apply w-full bg-ink px-3 font-sans text-base text-bone;
+    @apply w-full px-3 font-sans text-base;
     min-height: 48px;
-    border: 2px solid var(--ink-3);
-    border-radius: 0;
+    background: var(--field);
+    color: var(--fg);
+    border: 2px solid var(--line-2);
+    border-radius: 8px;
   }
-  .field-input:focus { border-color: var(--gold); outline: none; }
-  .field-input[aria-invalid='true'] { border-color: var(--blood); }
+  .field-input:focus { border-color: var(--red-deep); outline: none; box-shadow: 0 0 0 3px rgba(191, 58, 27, 0.25); }
+  .field-input[aria-invalid='true'] { border-color: var(--red); }
 
   .kicker {
     @apply font-mono text-xs uppercase;
-    letter-spacing: 0.18em;
-    color: var(--gold);
+    letter-spacing: 0.16em;
+    color: var(--red-text);
+  }
+
+  /* The three-colour stripe from the GT-01 casing. */
+  .stripe {
+    display: flex;
+    gap: 3px;
+  }
+  .stripe > span { display: block; height: 6px; flex: 1; }
+  .stripe > span:nth-child(1) { background: var(--red-key); }
+  .stripe > span:nth-child(2) { background: var(--amber); }
+  .stripe > span:nth-child(3) { background: var(--teal); }
+
+  .lcd {
+    background: var(--lcd);
+    color: var(--lcd-ink);
+    border-radius: 4px;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
   }
 
   /* Visually hidden but still in the DOM (the invite-request honeypot). */
@@ -104,6 +144,10 @@ a {
   }
 }
 
+@layer utilities {
+  .font-display { font-weight: 700; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .btn, .btn:hover { transition: none; transform: none; }
+  .btn, .btn:active { transition: none; transform: none; }
 }

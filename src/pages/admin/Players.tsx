@@ -17,7 +17,7 @@ function PlayerPanel({ player, onClose, onChanged }: { player: Player; onClose: 
   return (
     <Modal title={player.username} onClose={onClose}>
       {note && <Notice tone={note.tone}>{note.text}</Notice>}
-      <p className="mb-4 text-sm text-[var(--bone-2)]">
+      <p className="mb-4 text-sm text-fg-2">
         {player.role === 'admin' ? 'Admin' : 'Player'} · joined {shortDate(player.created_at)} · last login {shortDate(player.last_login_at)}
         <br />
         {player.games_launched} launches · {player.feedback_count} feedback · {player.upcoming_sessions} upcoming sessions
@@ -68,8 +68,8 @@ function PlayerPanel({ player, onClose, onChanged }: { player: Player; onClose: 
         </button>
       </form>
       {!self && (
-        <details className="border-t border-ink-3 pt-4">
-          <summary className="cursor-pointer text-sm text-[#ff8a7f]">Delete account…</summary>
+        <details className="border-t border-line pt-4">
+          <summary className="cursor-pointer text-sm text-red-text">Delete account…</summary>
           <Field label={`Type ${player.username} to confirm`} value={confirmName} onChange={(e) => setConfirmName(e.target.value)} autoComplete="off" />
           <button
             type="button"
@@ -114,17 +114,17 @@ export default function Players() {
       ) : data.length === 0 ? (
         <Notice>No players found.</Notice>
       ) : (
-        <ul className="divide-y divide-ink-3 border border-ink-3">
+        <ul className="divide-y divide-line rounded-lg border border-line bg-paper">
           {data.map((p) => (
             <li key={p.id}>
-              <button type="button" className="flex w-full flex-wrap items-center justify-between gap-2 px-4 py-3 text-left hover:bg-ink-2" onClick={() => setOpen(p)}>
+              <button type="button" className="flex w-full flex-wrap items-center justify-between gap-2 px-4 py-3 text-left hover:bg-casing" onClick={() => setOpen(p)}>
                 <span>
-                  <strong className="text-bone">{p.username}</strong>
-                  {p.role === 'admin' && <span className="ml-2 font-mono text-[11px] uppercase text-gold">admin</span>}
-                  {!p.is_active && <span className="ml-2 font-mono text-[11px] uppercase text-[#ff8a7f]">disabled</span>}
-                  <span className="block text-sm text-[var(--muted)]">{p.email ?? 'no email'}</span>
+                  <strong className="text-fg">{p.username}</strong>
+                  {p.role === 'admin' && <span className="ml-2 font-mono text-[11px] uppercase text-red-text">admin</span>}
+                  {!p.is_active && <span className="ml-2 font-mono text-[11px] uppercase text-red-text">disabled</span>}
+                  <span className="block text-sm text-fg-3">{p.email ?? 'no email'}</span>
                 </span>
-                <span className="font-mono text-xs text-[var(--muted)]">last login {shortDate(p.last_login_at)}</span>
+                <span className="font-mono text-xs text-fg-3">last login {shortDate(p.last_login_at)}</span>
               </button>
             </li>
           ))}

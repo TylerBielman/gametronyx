@@ -21,10 +21,10 @@ export default function Requests() {
         <ul className="mb-10 space-y-3">
           {pending.map((r) => (
             <li key={r.id} className="panel p-4">
-              <p className="font-semibold text-bone">
-                {r.name} <span className="font-normal text-[var(--muted)]">&lt;{r.email}&gt;</span>
+              <p className="font-semibold text-fg">
+                {r.name} <span className="font-normal text-fg-3">&lt;{r.email}&gt;</span>
               </p>
-              <p className="text-sm text-[var(--bone-2)]">
+              <p className="text-sm text-fg-2">
                 {r.game_interest ? `Interested in ${r.game_interest} · ` : ''}asked {shortDate(r.created_at)}
                 {r.has_account ? ' · already has an account' : ''}
               </p>
@@ -54,13 +54,13 @@ export default function Requests() {
       {handled.length > 0 && (
         <>
           <h2 className="mb-4 font-display text-lg uppercase tracking-wide">Handled</h2>
-          <ul className="divide-y divide-ink-3 border border-ink-3">
+          <ul className="divide-y divide-line rounded-lg border border-line bg-paper">
             {handled.map((r) => (
               <li key={r.id} className="flex flex-wrap justify-between gap-2 px-4 py-3 text-sm">
                 <span>
                   {r.name} &lt;{r.email}&gt;
                 </span>
-                <span className="text-[var(--muted)]">
+                <span className="text-fg-3">
                   {r.status}
                   {r.code ? ` · ${r.code}` : ''} · {shortDate(r.handled_at)}
                 </span>

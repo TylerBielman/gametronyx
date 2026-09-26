@@ -50,7 +50,7 @@ Gametronyx.com is a static React site on GitHub Pages. It talks to one **shared 
 | Back end | The existing NEWU FastAPI + Postgres accounts service (`TylerBielman/EFdungeon/backend`), extended with Gametronyx endpoints |
 | Hosting cost | $0 extra. The Hetzner server is already paid for, and GitHub Pages, Resend and GitHub API usage stay on free tiers |
 | Email | A **new, separate** free Resend account for `gametronyx.com`. It is never shared with underdog-football |
-| Look | Matches NEWU: warm off-black and bone palette, Archivo / Archivo Black / JetBrains Mono |
+| Look | The GT-01 handheld: an ironic 80s Eastern-bloc games bureau with faux-Soviet lettering (§4.4, U21) |
 | Gate | Launcher-only for now. Game links sit behind login; game URLs stay public |
 | Scheduling | Built into Gametronyx on the shared API: seat caps + waitlist, opt-in 4-hour email reminder, and a 15-minute email with the Discord details. Each slot is also posted as a Discord Scheduled Event |
 | DNS | GoDaddy |
@@ -94,7 +94,7 @@ Gametronyx.com is a static React site on GitHub Pages. It talks to one **shared 
 - **Routing** *(agent)*: `BrowserRouter`, with a `404.html` that is a copy of `index.html`, so deep links work on GitHub Pages. Hash routing is not used because the URL fragment carries login handoff codes (§5.6).
 - **Deploy**: a GitHub Actions workflow builds on every push to `main` and publishes to Pages. The `CNAME` file contains `gametronyx.com`, and "Enforce HTTPS" is on.
 - **Config**: `VITE_API_BASE=https://api.gametronyx.com`. This is the only build-time value, and it is not secret. In development it is empty and Vite proxies `/api` to a local API on port 8000.
-- **Fonts** *(agent)*: Archivo, Archivo Black and JetBrains Mono are bundled with the site (Fontsource, latin subsets, about 120 KB). The site makes no third-party requests.
+- **Fonts** *(agent)*: PT Sans Narrow, PT Mono and Press Start 2P are bundled with the site (Fontsource, latin and cyrillic subsets). The site makes no third-party requests.
 - **Deploy gate**: every push runs typecheck, tests and build. Pushes to `main` deploy to Pages only once the repo variable `PAGES_ENABLED` is `true`, so CI stays green while the repo is private.
 - **Repo visibility**: the repo stays **private while we build and is made public at launch** (Tyler's decision), right before Pages is turned on. GitHub Pages on a private repo needs a paid plan. The repo holds only front-end code and docs, so never commit secrets, server IPs or admin details. Those live in the EFdungeon repo and on the server.
 
@@ -136,7 +136,7 @@ The whole site is mobile-first, since most playtests happen on phones.
 ### 4.1 Public (not logged in)
 | Route | Content |
 |---|---|
-| `/` | **Showcase**. Hero with the Gametronyx wordmark; game cards (art, name, one-line pitch, status badge "Open playtest" / "Scheduled playtests" / "Coming soon"); link-out cards to Tyler's other sites (§11); buttons for **Log in**, **I have an invite code** and **Request an invite**. |
+| `/` | **Showcase**. The GT-01 handheld (§4.4). Its A, B and Start keys are **Request invite**, **Log in** and **I have a code**. Operating instructions sit beside it. Game cartridges show art, name, one-line pitch and status ("Open playtest" / "Scheduled sessions" / "Coming soon"). Link-outs to Tyler's other sites are covered in §11. |
 | `/request-invite` | Form: name, email, "Which game are you interested in?" (optional), "Anything you'd like Tyler to know?" (optional). It has a hidden honeypot field and is rate-limited. The page then says "Thanks, Tyler will email you an invite code if there's room." |
 | `/join` | Step 1: invite code, prefilled from `/join#code=…` in an approved-invite email. Step 2: email, username, password and password confirmation, plus a line linking the privacy notice. It then logs the player in and goes to `/play`. |
 | `/login` | Username **or** email, plus password. Links to "Forgot password?" and "I have an invite code". |
@@ -159,22 +159,31 @@ The whole site is mobile-first, since most playtests happen on phones.
 ### 4.3 Admin (role = admin)
 `/admin` with tabs: **Activity · Players · Invite codes · Invite requests · Games · Playtest slots · Settings** (detail in §8).
 
-### 4.4 Visual design: match NEWU
-The palette and type come from NEWU's `ef-app/src/styles/tokens.css`:
+### 4.4 Visual design: the GT-01 handheld
+The site is an ironic 80s Eastern-bloc games bureau: the home page is a beige handheld, the "GT-01", and each game is a cartridge (U21). Tyler's logo (`public/brand/gametronyx-logo.webp`) sits in the charcoal header and on the handheld. The catchphrase is **"We kill your high score in the face!"**
+
+- **Home page.** The handheld's LCD carries the catchphrase and spells out the controls. The keys are the real actions:
+  - Signed out: **A** = Request invite, **B** = Log in, **Start** = I have a code.
+  - Signed in: **A** = Play, **B** = Schedule, **Start** = My account.
+  - Beside it, the "Operating instructions" explain the same steps.
+- **Cartridges.** A game card has grip ridges and a paper label. It shows the game's art, its catalogue number (GT-02, GT-03, GT-04), the pitch and a status line. Art comes from the game's `art_url` if admin set one, else the built-in images in `public/art/<slug>.webp`.
+- **Faux-Soviet lettering.** Decorative labels swap in Cyrillic look-alikes (Д for A, И for N, Ф for O, Я for R, Ш for W): "MФDEL GT-01", "ФPEЯДTIИG MДИUДL". It is not a real language (U21). Anything a player must read or tap stays plain English, and screen readers get the plain English (`<Faux>`).
+- **Tokens** (`src/styles/index.css`):
 
 | Token | Value | Use |
 |---|---|---|
-| `--ink` / `--ink-2` / `--ink-3` | `#17140F` / `#221D16` / `#2E2820` | Page and panel backgrounds, from darkest to lightest |
-| `--bone` / `--bone-2` / `--bone-3` | `#F2EBDB` / `#E6DDC6` / `#D2C6A6` | Text and card surfaces |
-| `--gold` | `#E8B84A` | Accent: kickers, links, focus rings, secondary buttons |
-| `--blood` | `#C2392E` | Primary buttons (as on NEWU), wordmark accent, errors |
-| `--muted` | `#B3A88D` | Secondary text (7.8:1 on `--ink`); the only token not in NEWU |
-| `--cash` | `#4FB36A` | Success, "Open playtest" badge |
-| `--display` | Archivo Black | Wordmark and headings |
-| `--sans` | Archivo 400–900 | Body |
-| `--mono` | JetBrains Mono | Times, codes, admin tables |
+| `--page` | `#CFC8B6` | Page background (beige plastic) |
+| `--casing` / `--paper` / `--field` | `#E6E0CF` / `#F1ECDF` / `#FBF8F0` | Handheld shell, panels and manual pages, inputs |
+| `--char` / `--char-2` / `--char-3` | `#262521` / `#2D2C28` / `#3A3934` | Header, bezel, dark keys, cartridge shells |
+| `--fg` / `--fg-2` / `--fg-3` | `#262521` / `#45413A` / `#57524A` | Text; `--fg-3` is 4.6:1 on `--page` |
+| `--red` / `--red-key` / `--red-text` | `#BF3A1B` / `#D8431F` / `#922B14` | Primary buttons, the A key, accent text and links |
+| `--amber` / `--teal` | `#F2A33A` / `#1FB3B8` | Secondary buttons; the red, amber and teal casing stripe |
+| `--lcd` / `--lcd-ink` | `#A6B389` / `#26301B` | The LCD, confirmations |
+| Display and body | PT Sans Narrow 400/700 | Headings (uppercase) and body |
+| Mono | PT Mono | Labels, codes, times |
+| Pixel | Press Start 2P | LCD text |
 
-Buttons are NEWU's slanted uppercase buttons (`.btn primary / gold / cash / ghost`). The logo is a text wordmark in Archivo Black until Tyler provides one. Text contrast must meet WCAG AA; the tightest pair is bone on the red primary button at 4.51:1.
+Fonts are bundled (latin and cyrillic subsets), so the site makes no third-party requests. Buttons are pill keys (`.btn primary / gold / cash / ghost`). Every text pair meets WCAG AA; the tightest is `--red-text` on `--page` at 4.9:1. Link previews use `public/brand/og.jpg`, made from Tyler's CRT artwork.
 
 ---
 

@@ -49,7 +49,7 @@ function RequestForm() {
             </form>
           </>
         )}
-        <p className="mt-5 text-sm text-[var(--muted)]">
+        <p className="mt-5 text-sm text-fg-3">
           No Easy Way Up account without an email? Ask Tyler to reset it for you.
         </p>
       </Panel>

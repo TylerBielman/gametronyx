@@ -40,7 +40,7 @@ export default function RequestInvite() {
       <div className="mx-auto max-w-lg">
         <PageHeader kicker="Request sent" title="Thanks!">
           Tyler reads every request. If there's room in a playtest, he'll email you an invite code at{' '}
-          <strong className="text-bone">{email.trim()}</strong>.
+          <strong className="text-fg">{email.trim()}</strong>.
         </PageHeader>
         <Link to="/" className="btn ghost">
           Back to the games
@@ -69,7 +69,7 @@ export default function RequestInvite() {
             hint="Your invite code will be sent here."
           />
           <div className="mb-5">
-            <label htmlFor="game-interest" className="mb-2 block font-display text-xs uppercase tracking-widest text-bone-2">
+            <label htmlFor="game-interest" className="mb-2 block font-display text-xs uppercase tracking-widest text-fg-2">
               Which game interests you? (optional)
             </label>
             <select id="game-interest" className="field-input" value={game} onChange={(e) => setGame(e.target.value)}>

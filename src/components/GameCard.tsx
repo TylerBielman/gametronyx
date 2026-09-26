@@ -1,50 +1,60 @@
 import type { ReactNode } from 'react';
 import type { Game } from '../lib/api';
+import { CARTRIDGE_CODES, DEFAULT_ART } from '../lib/art';
+import Faux from './Faux';
 
-const BADGES: Record<string, { label: string; className: string }> = {
-  open_playtest: { label: 'Open playtest', className: 'bg-cash text-ink' },
-  scheduled_playtest: { label: 'Scheduled playtests', className: 'bg-gold text-ink' },
-  showcase_only: { label: 'Coming soon', className: 'bg-ink-3 text-bone' },
+const STATUS: Record<string, string> = {
+  open_playtest: 'Open playtest',
+  scheduled_playtest: 'Scheduled sessions',
+  showcase_only: 'Coming soon',
 };
 
-function Art({ game }: { game: Game }) {
-  if (game.art_url) {
-    return <img src={game.art_url} alt="" className="aspect-[16/9] w-full object-cover" loading="lazy" />;
+function Label({ game }: { game: Game }) {
+  const art = game.art_url || DEFAULT_ART[game.slug];
+  if (art) {
+    return (
+      <img
+        src={art}
+        alt={`Screenshot of ${game.name}`}
+        className="aspect-[16/9] w-full rounded-sm bg-char object-cover object-top"
+        loading="lazy"
+      />
+    );
   }
-  // No art yet: a typographic band in the house style.
+  // No art yet: a blank LCD label with the name.
   return (
-    <div
-      aria-hidden="true"
-      className="flex aspect-[5/2] w-full items-end overflow-hidden bg-ink-3 p-4"
-      style={{
-        backgroundImage:
-          'repeating-linear-gradient(135deg, rgba(242,235,219,0.04) 0 12px, transparent 12px 24px), radial-gradient(circle at 80% 20%, rgba(194,57,46,0.35), transparent 55%)',
-      }}
-    >
-      {/* Colors are CSS variables, so Tailwind's /opacity modifier can't apply. */}
-      <span className="font-display text-4xl uppercase leading-none sm:text-5xl" style={{ color: 'rgba(242,235,219,0.14)' }}>
-        {game.name}
-      </span>
+    <div className="lcd flex aspect-[16/9] w-full flex-col items-center justify-center gap-3 p-4 text-center" aria-hidden="true">
+      <Faux text="No label" className="font-mono text-xs tracking-[0.14em] text-lcd-dim" />
+      <span className="font-pixel text-sm uppercase leading-relaxed">{game.name}</span>
     </div>
   );
 }
 
+/** A game as a GT cartridge: grip ridges, then a paper label with the art. */
 export default function GameCard({ game, action }: { game: Game; action?: ReactNode }) {
-  const badge = BADGES[game.type] ?? BADGES.showcase_only;
+  const code = CARTRIDGE_CODES[game.slug];
   return (
-    <article className="panel flex flex-col">
-      <Art game={game} />
-      <div className="flex flex-1 flex-col p-5">
-        <span className={`mb-3 self-start px-2 py-1 font-mono text-[11px] font-semibold uppercase tracking-widest ${badge.className}`}>
-          {badge.label}
-        </span>
-        <h3 className="font-display text-xl uppercase tracking-wide">{game.name}</h3>
-        {game.pitch && <p className="mt-2 flex-1 text-[var(--bone-2)]">{game.pitch}</p>}
+    <article className="flex flex-col gap-3 rounded-[10px_10px_4px_4px] bg-char-3 p-3 shadow-[0_3px_0_#11100e]">
+      <div
+        aria-hidden="true"
+        className="h-2.5 rounded-sm"
+        style={{ background: 'repeating-linear-gradient(90deg, #2d2c28 0 6px, #46453f 6px 10px)' }}
+      />
+      <div className="flex flex-1 flex-col gap-3 rounded-sm bg-paper p-3">
+        <Label game={game} />
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="font-display text-2xl uppercase leading-tight">{game.name}</h3>
+          {code && <span className="shrink-0 font-mono text-xs text-fg-3">{code}</span>}
+        </div>
+        {game.pitch && <p className="flex-1 leading-snug text-fg-2">{game.pitch}</p>}
+        <p className="font-mono text-xs uppercase tracking-wider text-fg-3">
+          Status: <span className="text-red-text">{STATUS[game.type] ?? STATUS.showcase_only}</span>
+        </p>
         {(action || game.site_url) && (
-          <div className="mt-5 flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             {action}
             {game.site_url && (
-              <a href={game.site_url} target="_blank" rel="noreferrer" className="text-sm font-semibold">
+              <a href={game.site_url} target="_blank" rel="noreferrer" className="text-sm font-bold">
                 Visit site ↗
               </a>
             )}

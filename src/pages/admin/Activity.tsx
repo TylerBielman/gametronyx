@@ -51,7 +51,7 @@ export default function Activity() {
   return (
     <>
       <div className="mb-5 flex flex-wrap items-center gap-3">
-        <label htmlFor="activity-type" className="font-display text-xs uppercase tracking-widest text-bone-2">
+        <label htmlFor="activity-type" className="font-display text-xs uppercase tracking-widest text-fg-2">
           Show
         </label>
         <select
@@ -78,11 +78,11 @@ export default function Activity() {
       ) : events.length === 0 ? (
         <Notice>Nothing yet.</Notice>
       ) : (
-        <ol className="divide-y divide-ink-3 border border-ink-3">
+        <ol className="divide-y divide-line rounded-lg border border-line bg-paper">
           {events.map((e) => (
             <li key={e.id} className="flex flex-wrap justify-between gap-x-4 gap-y-1 px-4 py-3 text-sm">
               <span>{line(e)}</span>
-              <time className="font-mono text-xs text-[var(--muted)]" dateTime={e.at ?? undefined}>
+              <time className="font-mono text-xs text-fg-3" dateTime={e.at ?? undefined}>
                 {shortDate(e.at)}
               </time>
             </li>
