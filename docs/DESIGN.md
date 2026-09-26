@@ -503,7 +503,7 @@ The front end holds no secrets.
 ---
 
 ## 11. Link-outs
-- The showcase links out to **noeasywayup.com only**, for now. More can be added later as *showcase only* games in admin.
+- Game cards carry **no website link**: the Play button already opens the game (U23). A game's `site_url` stays in admin but isn't shown. The footer keeps one link, to noeasywayup.com.
 - Red Ring appears **only as a scheduled-playtest game**, not as a link-out (Tyler's decision).
 
 ## 12. Setup checklist (for Tyler)

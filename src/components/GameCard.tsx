@@ -86,16 +86,8 @@ export default function GameCard({ game, action }: { game: Game; action?: ReactN
         <p className="font-mono text-xs uppercase tracking-wider text-fg-3">
           Status: <span className="text-red-text">{STATUS[game.type] ?? STATUS.showcase_only}</span>
         </p>
-        {(action || game.site_url) && (
-          <div className="flex flex-wrap items-center gap-4">
-            {action}
-            {game.site_url && (
-              <a href={game.site_url} target="_blank" rel="noreferrer" className="text-sm font-bold">
-                Visit site ↗
-              </a>
-            )}
-          </div>
-        )}
+        {/* No "Visit site" link: Play already opens the game (DECISIONS U23). */}
+        {action && <div className="flex flex-wrap items-center gap-4">{action}</div>}
       </div>
     </article>
   );

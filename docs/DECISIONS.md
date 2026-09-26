@@ -20,7 +20,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | U12 | Slot capacity | **Seat cap per slot + waitlist** with automatic promotion |
 | U13 | Look | ~~Match NEWU~~ (superseded by U21 on 2026-09-26) |
 | U14 | Age | **No age check** (invite-only; Tyler vouches for invitees) |
-| U15 | Link-outs | **noeasywayup.com only** for now. Red Ring is shown only as a scheduled-playtest game, not as a link-out |
+| U15 | Link-outs | **noeasywayup.com only** for now (card link removed by U23). Red Ring is shown only as a scheduled-playtest game, not as a link-out |
 | U16 | Scheduling | Use a free existing tool only if it is seamless for players. Research found none that meets the brief, so it is **built in** on the shared API (Cal.com Free was the runner-up; see DESIGN §7) |
 | U17 | Discord | Email carries the Discord details; **each slot is also posted as a Discord Scheduled Event** through a bot |
 | U18 | Repo visibility | Private while building; **public at launch** so GitHub Pages works on the free plan |
@@ -28,6 +28,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | U20 | Discord (2026-09-26) | Skipped at launch; add the bot token and the server settings later |
 | U21 | Look (2026-09-26) | **The 80s handheld** from the four mockups: an ironic old Eastern-bloc game company, with the catchphrase "We kill your high score in the face!" No real language: decorative text is **faux-Soviet lettering** only. No price stickers over the game art. The A and B keys must make it obvious what to press. Red Ring's card art is Tyler's hand screenshot |
 | U22 | Platforms (2026-09-26) | Cartridges say where each game runs: **Jerboa: mobile or desktop**; **No Easy Way Up and Red Ring: desktop only** |
+| U23 | Card link-outs (2026-09-26) | **No "Visit site" link on game cards.** Play already opens the game. Replaces U15's card link-out; the footer link to noeasywayup.com stays |
 
 ## Agent calls (for Tyler's review)
 
