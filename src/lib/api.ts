@@ -36,6 +36,40 @@ export interface RegisterInput {
   timezone?: string | null;
 }
 
+export interface MySignup {
+  id: number;
+  status: 'confirmed' | 'waitlisted';
+  position: number | null;
+  remind_4h: boolean;
+}
+
+export interface Slot {
+  id: number;
+  game_slug: string;
+  game_name: string;
+  starts_at: string;
+  ends_at: string;
+  duration_min: number;
+  capacity: number;
+  seats_left: number;
+  waitlist_count: number;
+  status: string;
+  my_signup: MySignup | null;
+}
+
+export interface JoinInfo {
+  invite_url: string | null;
+  channel_name: string | null;
+  channel_url: string | null;
+  notes: string | null;
+}
+
+export interface MySession {
+  signup: MySignup;
+  slot: Slot;
+  join: JoinInfo | null;
+}
+
 export interface InviteRequestInput {
   name: string;
   email: string;
@@ -144,6 +178,14 @@ export const api = {
   confirmReset: async (resetToken: string, password: string) =>
     (await request<TokenResponse>('/auth/reset/confirm', { json: { token: resetToken, password } }))
       .access_token,
+  slots: (token: string) => request<Slot[]>('/playtests/slots', { token }),
+  signUp: (token: string, slotId: number, remind_4h: boolean) =>
+    request<MySession>(`/playtests/slots/${slotId}/signup`, { json: { remind_4h }, token }),
+  leave: (token: string, slotId: number) =>
+    request<{ ok: boolean }>(`/playtests/slots/${slotId}/signup`, { method: 'DELETE', token }),
+  setReminder: (token: string, signupId: number, remind_4h: boolean) =>
+    request<MySession>(`/playtests/signups/${signupId}`, { method: 'PATCH', json: { remind_4h }, token }),
+  mySessions: (token: string) => request<MySession[]>('/playtests/me', { token }),
   handoff: (token: string, game_slug: string) =>
     request<{ code: string; expires_in: number; launch_url: string }>('/auth/handoff', {
       json: { game_slug },

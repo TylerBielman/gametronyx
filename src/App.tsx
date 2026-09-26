@@ -10,6 +10,7 @@ import NotFound from './pages/NotFound';
 import Play from './pages/Play';
 import Privacy from './pages/Privacy';
 import RequestInvite from './pages/RequestInvite';
+import { GameSchedule, ScheduleMenu } from './pages/Schedule';
 import Reset from './pages/Reset';
 import Showcase from './pages/Showcase';
 import VerifyEmail from './pages/VerifyEmail';
@@ -39,6 +40,22 @@ export default function App() {
           element={
             <RequireAuth>
               <Play />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/schedule"
+          element={
+            <RequireAuth>
+              <ScheduleMenu />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/schedule/:slug"
+          element={
+            <RequireAuth>
+              <GameSchedule />
             </RequireAuth>
           }
         />

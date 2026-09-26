@@ -4,14 +4,14 @@ import { useAuth } from '../lib/auth';
 
 function Wordmark() {
   return (
-    <Link to="/" className="font-display text-xl uppercase tracking-wider text-bone no-underline sm:text-2xl">
+    <Link to="/" className="font-display text-lg uppercase tracking-wider text-bone no-underline sm:text-2xl">
       Game<span className="text-blood">tronyx</span>
     </Link>
   );
 }
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
-  `font-display text-xs uppercase tracking-widest no-underline ${isActive ? 'text-gold' : 'text-bone hover:text-gold'}`;
+  `font-display text-[11px] uppercase tracking-wider no-underline sm:text-xs sm:tracking-widest ${isActive ? 'text-gold' : 'text-bone hover:text-gold'}`;
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { status, user } = useAuth();
@@ -26,14 +26,24 @@ export default function Layout({ children }: { children: ReactNode }) {
       <header className="border-b border-ink-3">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4">
           <Wordmark />
-          <nav aria-label="Main" className="flex items-center gap-5">
+          <nav aria-label="Main" className="flex items-center gap-3 sm:gap-5">
             {status === 'authed' && user ? (
               <>
                 <NavLink to="/play" className={navClass}>
                   Play
                 </NavLink>
-                <NavLink to="/me" className={navClass} title="Your account">
-                  {user.username}
+                <NavLink to="/schedule" className={navClass}>
+                  Schedule
+                </NavLink>
+                <NavLink
+                  to="/me"
+                  className={(state) => `${navClass(state)} inline-block max-w-[10rem] truncate align-middle`}
+                  title={`Your account (${user.username})`}
+                  aria-label={`Your account (${user.username})`}
+                >
+                  {/* Phones: three links plus the wordmark leave no room for a name. */}
+                  <span className="sm:hidden">Me</span>
+                  <span className="hidden sm:inline">{user.username}</span>
                 </NavLink>
               </>
             ) : status === 'anon' ? (

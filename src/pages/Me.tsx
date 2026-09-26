@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import MySessions from '../components/MySessions';
 import { Field, Notice, PageHeader, Panel } from '../components/ui';
 import { api, ApiError } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -125,6 +126,7 @@ export default function Me() {
       <PageHeader kicker="Your account" title={user?.username ?? 'Account'}>
         Your username can't be changed here. It's the same on No Easy Way Up.
       </PageHeader>
+      <MySessions />
       <EmailForm />
       <PasswordForm />
       <Link to="/logout" className="btn ghost w-full">

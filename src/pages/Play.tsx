@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import GameCard from '../components/GameCard';
 import { Notice, PageHeader, Spinner } from '../components/ui';
 import { api, ApiError, type Game } from '../lib/api';
@@ -79,7 +80,7 @@ export default function Play() {
   return (
     <>
       <PageHeader kicker={`Hi, ${user?.username ?? 'playtester'}`} title="Your playtests">
-        Play the open builds as much as you like. Scheduled sessions are coming soon.
+        Play the open builds as much as you like, or grab a seat in a scheduled multiplayer session.
       </PageHeader>
       <VerifyBanner />
       {fromFallback && <Notice tone="error">The game list is offline right now, so Play buttons may not work.</Notice>}
@@ -107,7 +108,11 @@ export default function Play() {
                   <GameCard
                     key={g.slug}
                     game={g}
-                    action={<span className="font-mono text-xs uppercase tracking-widest text-gold">Sign-ups open soon</span>}
+                    action={
+                      <Link to={`/schedule/${g.slug}`} className="btn gold">
+                        See sessions
+                      </Link>
+                    }
                   />
                 ))}
               </div>

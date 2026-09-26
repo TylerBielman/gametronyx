@@ -150,8 +150,9 @@ The whole site is mobile-first, since most playtests happen on phones.
 |---|---|
 | `/play` | **Open playtests**: a card per open game with a **Play** button (§5.6 handoff; the game opens in the same tab). **Scheduled playtests** show "Sign-ups open soon" until M5. A banner asks unconfirmed players to confirm their email. |
 | `/add-email` | The one-time step for NEWU accounts without an email (below). |
-| `/schedule` | Menu of scheduled-playtest games with brief descriptions → pick a game → pick a timeslot (§7). |
-| `/me` | Account: username (read-only), email (edit), change password, default reminder preference, upcoming sessions with a Cancel button, and log out. |
+| `/schedule` | Menu of scheduled-playtest games with brief descriptions and their session counts. |
+| `/schedule/:slug` | That game's upcoming sessions, grouped by day in the player's time zone, with seats left or the waitlist length. **Sign up** or **Join waitlist** opens a confirm sheet with the 4-hour reminder checkbox (§7). |
+| `/me` | Account: **My sessions** (status, reminder toggle, Cancel/Leave waitlist, and the Discord join panel from 15 minutes before), email (edit), change password, and log out. |
 
 - **First login by an existing NEWU player**: if the account has no email, a one-time "Add your email" step appears before `/play`, because the brief says every playtester provides an email.
 
@@ -276,6 +277,14 @@ All paths are under `https://api.gametronyx.com/api`. `/auth/*` is also reachabl
 | `POST /admin/invite-requests/{id}/approve` | admin | Mints a one-off code and emails a `/join#code=…` link (M2) |
 | `POST /admin/invite-requests/{id}/decline` | admin | Silent decline (M2) |
 | `POST /feedback` `{game_slug, text, build_sha?, runs?, client?}` | player | In-game feedback, filed as a GitHub issue in the background; 10 per hour (M4) |
+| `GET /playtests/slots` | player | Upcoming open sessions with seats, waitlist length and your signup (M5) |
+| `POST /playtests/slots/{id}/signup` `{remind_4h}` · `DELETE` the same path | player | Take a seat (or join the waitlist) · give it up, which promotes the next player (M5) |
+| `PATCH /playtests/signups/{id}` `{remind_4h}` | player | Toggle the 4-hour reminder (M5) |
+| `GET /playtests/me` | player | Your upcoming sessions, with Discord join details from 15 minutes before (M5) |
+| `GET/POST /admin/playtests/slots` · `PATCH /admin/playtests/slots/{id}` · `POST …/{id}/cancel` | admin | List (`?when=upcoming\|past`), create (with `repeat_weeks`), edit, cancel sessions (M5) |
+| `GET/POST /admin/playtests/slots/{id}/roster` · `DELETE …/roster/{signup_id}` | admin | Roster; add a player by username or email; remove (promotes) (M5) |
+| `GET /admin/discord/channels` | admin | Voice channels, loaded through the bot (M5) |
+| `GET/PUT /admin/settings` | admin | Discord server ID and invite, slot defaults, alert toggles, and which secrets are configured (M5) |
 
 Errors come back as `{detail: "<message>"}` with `400` (bad input), `401` (no or expired session), `403` (disabled account or not an admin), `404`, `409` (username or email taken) or `429` (rate limited, with `Retry-After`). The site shows its own friendly copy for invite-code errors (§5.3).
 
@@ -538,6 +547,6 @@ Steps that need Tyler's accounts or root SSH on the server:
 2. **M2 Site shell** (*built*; the API half is on the same EFdungeon branch as M1): repo scaffold, NEWU tokens, showcase, request-invite, join, login, add-email, reset, verify-email, privacy, `/play` launcher and `/me`, plus the Pages workflow. Deploys once the repo is public and `PAGES_ENABLED` is set.
 3. **M3 Launcher** (*built*: NEWU on the EFdungeon branch, Jerboa on 3-minutes-to-midnight's `claude/exciting-cray-m4hq8k`): `/play`, handoff in NEWU and Jerboa, and NEWU's basic auth removed from the repo configs. The live nginx edit is checklist step C7.
 4. **M4 Feedback** (*built*): `POST /api/feedback`, GitHub issues with retries (EFdungeon branch); the Jerboa popup with tests (3-minutes-to-midnight branch).
-5. **M5 Scheduling**: slots, signups and waitlist; `/schedule` and My sessions; the timer; confirmation, reminder and Discord emails with `.ics`; Discord Scheduled Events.
+5. **M5 Scheduling** (*built*: API on the EFdungeon branch, pages here): slots, signups and waitlist; `/schedule` and My sessions; the timer; confirmation, reminder and Discord emails with `.ics`; Discord Scheduled Events. Creating sessions needs the admin UI (M6), or the admin API until then.
 6. **M6 Admin**: all tabs, activity feed and settings.
 7. **M7 Launch**: the §12 checklist and smoke test; invite the first playtesters.

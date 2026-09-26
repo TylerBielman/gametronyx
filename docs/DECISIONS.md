@@ -67,6 +67,10 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | A36 | Logging out goes through a public `/logout` route | Logging out on a protected page otherwise bounced to `/login?next=…` |
 | A37 | Link fragments (`#code`, `#token`) are picked up even on fragment-only navigation, then stripped | Pasting a link into a tab already on that page must still work |
 | A38 | `.npmrc` sets `legacy-peer-deps` | npm 10 crashes resolving vitest's optional peers; peers are listed explicitly instead |
+| A39 | On phones the account link reads "Me" (the full username is in its tooltip and accessible name) | Wordmark plus Play, Schedule and a username overflowed 360 px; usernames can be 50 characters |
+| A40 | Sign-up needs an email on the account; the API refuses without one | The 15-minute Discord link is sent by email |
+| A41 | Emails carry times already formatted in each player's zone, stored in the outbox payload | A retried send says exactly what the first attempt would have |
+| A42 | A signup waitlisted after the 4-hour mark gets no reminder; one promoted inside 15 minutes gets the Discord email at once | Consistent with A21 |
 
 ## Open items
 None block the design. Values Tyler supplies at setup (DESIGN §12): the Discord server ID and invite, the bot token, the Resend key, the GitHub token, and the GoDaddy DNS records.
