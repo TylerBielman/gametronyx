@@ -275,6 +275,7 @@ All paths are under `https://api.gametronyx.com/api`. `/auth/*` is also reachabl
 | `GET /admin/invite-requests` | admin | Pending first, then handled (M2) |
 | `POST /admin/invite-requests/{id}/approve` | admin | Mints a one-off code and emails a `/join#code=…` link (M2) |
 | `POST /admin/invite-requests/{id}/decline` | admin | Silent decline (M2) |
+| `POST /feedback` `{game_slug, text, build_sha?, runs?, client?}` | player | In-game feedback, filed as a GitHub issue in the background; 10 per hour (M4) |
 
 Errors come back as `{detail: "<message>"}` with `400` (bad input), `401` (no or expired session), `403` (disabled account or not an admin), `404`, `409` (username or email taken) or `429` (rate limited, with `Retry-After`). The site shows its own friendly copy for invite-code errors (§5.3).
 
@@ -535,8 +536,8 @@ Steps that need Tyler's accounts or root SSH on the server:
 ## 14. Milestones
 1. **M1 Accounts API** (*built* on EFdungeon branch `claude/exciting-cray-m4hq8k`; not yet deployed): migration `0006`; email, role and rate limits; login `is_active` fix; invite master and revoke; reset; email confirmation; handoff; CORS; the `api.gametronyx.com` vhost; the notifications timer. The `settings`, `invite_requests`, `feedback` and playtest tables arrive with the milestones that use them.
 2. **M2 Site shell** (*built*; the API half is on the same EFdungeon branch as M1): repo scaffold, NEWU tokens, showcase, request-invite, join, login, add-email, reset, verify-email, privacy, `/play` launcher and `/me`, plus the Pages workflow. Deploys once the repo is public and `PAGES_ENABLED` is set.
-3. **M3 Launcher**: `/play`, handoff in NEWU and Jerboa, removal of NEWU's basic auth.
-4. **M4 Feedback**: `feedback` API and GitHub issues; the Jerboa popup with tests.
+3. **M3 Launcher** (*built*: NEWU on the EFdungeon branch, Jerboa on 3-minutes-to-midnight's `claude/exciting-cray-m4hq8k`): `/play`, handoff in NEWU and Jerboa, and NEWU's basic auth removed from the repo configs. The live nginx edit is checklist step C7.
+4. **M4 Feedback** (*built*): `POST /api/feedback`, GitHub issues with retries (EFdungeon branch); the Jerboa popup with tests (3-minutes-to-midnight branch).
 5. **M5 Scheduling**: slots, signups and waitlist; `/schedule` and My sessions; the timer; confirmation, reminder and Discord emails with `.ics`; Discord Scheduled Events.
 6. **M6 Admin**: all tabs, activity feed and settings.
 7. **M7 Launch**: the §12 checklist and smoke test; invite the first playtesters.
