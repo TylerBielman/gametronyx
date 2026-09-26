@@ -60,6 +60,13 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | A29 | Without `RESEND_API_KEY_GTX`, emails are marked `disabled` instead of queued | Stale reset links shouldn't fire once a key is added |
 | A30 | The API keeps NEWU's specific invite errors ("Invalid invite code", "Invite code already used"); the Gametronyx UI shows one generic message | NEWU's client and tests depend on the specific messages |
 | A31 | Fixed a pre-existing bug found while testing: over-size saves and bug reports returned 500 instead of 413 | Separate commit on the same branch; test-provable |
+| A32 | Fonts bundled with the site (Fontsource) instead of Google Fonts | No third-party requests from playtesters' browsers; one less outside dependency |
+| A33 | Primary buttons use NEWU's red (`--blood`); gold is the accent and secondary button color | "Match NEWU" (U13): NEWU's primary buttons are red. Supersedes the spec's original "gold primary" |
+| A34 | Pages deploy is gated on the `PAGES_ENABLED` repo variable | The repo stays private until launch (U18); CI shouldn't be red meanwhile |
+| A35 | `GET /games` never returns `play_url`; Play goes through the handoff | Keeps the launcher-only gate (U7) meaningful |
+| A36 | Logging out goes through a public `/logout` route | Logging out on a protected page otherwise bounced to `/login?next=…` |
+| A37 | Link fragments (`#code`, `#token`) are picked up even on fragment-only navigation, then stripped | Pasting a link into a tab already on that page must still work |
+| A38 | `.npmrc` sets `legacy-peer-deps` | npm 10 crashes resolving vitest's optional peers; peers are listed explicitly instead |
 
 ## Open items
 None block the design. Values Tyler supplies at setup (DESIGN §12): the Discord server ID and invite, the bot token, the Resend key, the GitHub token, and the GoDaddy DNS records.

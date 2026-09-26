@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /play
+Disallow: /me
+Disallow: /admin
+Disallow: /join
+Disallow: /reset
+Disallow: /verify-email

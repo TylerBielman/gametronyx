@@ -93,7 +93,9 @@ Gametronyx.com is a static React site on GitHub Pages. It talks to one **shared 
 - **Stack** *(agent)*: React + Vite + TypeScript + Tailwind, the same as NEWU's `ef-app`, so tokens and components can be copied across.
 - **Routing** *(agent)*: `BrowserRouter`, with a `404.html` that is a copy of `index.html`, so deep links work on GitHub Pages. Hash routing is not used because the URL fragment carries login handoff codes (§5.6).
 - **Deploy**: a GitHub Actions workflow builds on every push to `main` and publishes to Pages. The `CNAME` file contains `gametronyx.com`, and "Enforce HTTPS" is on.
-- **Config**: `VITE_API_BASE=https://api.gametronyx.com`. This is the only build-time value, and it is not secret.
+- **Config**: `VITE_API_BASE=https://api.gametronyx.com`. This is the only build-time value, and it is not secret. In development it is empty and Vite proxies `/api` to a local API on port 8000.
+- **Fonts** *(agent)*: Archivo, Archivo Black and JetBrains Mono are bundled with the site (Fontsource, latin subsets, about 120 KB). The site makes no third-party requests.
+- **Deploy gate**: every push runs typecheck, tests and build. Pushes to `main` deploy to Pages only once the repo variable `PAGES_ENABLED` is `true`, so CI stays green while the repo is private.
 - **Repo visibility**: the repo stays **private while we build and is made public at launch** (Tyler's decision), right before Pages is turned on. GitHub Pages on a private repo needs a paid plan. The repo holds only front-end code and docs, so never commit secrets, server IPs or admin details. Those live in the EFdungeon repo and on the server.
 
 ### 3.2 Back end: shared player-accounts API
@@ -136,16 +138,18 @@ The whole site is mobile-first, since most playtests happen on phones.
 |---|---|
 | `/` | **Showcase**. Hero with the Gametronyx wordmark; game cards (art, name, one-line pitch, status badge "Open playtest" / "Scheduled playtests" / "Coming soon"); link-out cards to Tyler's other sites (§11); buttons for **Log in**, **I have an invite code** and **Request an invite**. |
 | `/request-invite` | Form: name, email, "Which game are you interested in?" (optional), "Anything you'd like Tyler to know?" (optional). It has a hidden honeypot field and is rate-limited. The page then says "Thanks, Tyler will email you an invite code if there's room." |
-| `/join` | Step 1: invite code. Step 2: email, username, password and password confirmation, plus a line linking the privacy notice. It then logs the player in and goes to `/play`. |
+| `/join` | Step 1: invite code, prefilled from `/join#code=…` in an approved-invite email. Step 2: email, username, password and password confirmation, plus a line linking the privacy notice. It then logs the player in and goes to `/play`. |
 | `/login` | Username **or** email, plus password. Links to "Forgot password?" and "I have an invite code". |
 | `/reset` | Request a reset link by email. `/reset#token=…` (the emailed link) sets a new password. Tokens ride in the URL fragment so they never reach a server log. |
 | `/verify-email#token=…` | Confirms the player's email from the welcome or change-of-email message. Works without being logged in. |
+| `/logout` | Signs out and returns to the showcase. |
 | `/privacy` | Short privacy notice (§10.3). |
 
 ### 4.2 Player (logged in)
 | Route | Content |
 |---|---|
-| `/play` | **Open playtests**: a card per open game with a **Play** button (§5.6 handoff), plus **Scheduled playtests** and **My sessions** shortcuts. |
+| `/play` | **Open playtests**: a card per open game with a **Play** button (§5.6 handoff; the game opens in the same tab). **Scheduled playtests** show "Sign-ups open soon" until M5. A banner asks unconfirmed players to confirm their email. |
+| `/add-email` | The one-time step for NEWU accounts without an email (below). |
 | `/schedule` | Menu of scheduled-playtest games with brief descriptions → pick a game → pick a timeslot (§7). |
 | `/me` | Account: username (read-only), email (edit), change password, default reminder preference, upcoming sessions with a Cancel button, and log out. |
 
@@ -161,14 +165,15 @@ The palette and type come from NEWU's `ef-app/src/styles/tokens.css`:
 |---|---|---|
 | `--ink` / `--ink-2` / `--ink-3` | `#17140F` / `#221D16` / `#2E2820` | Page and panel backgrounds, from darkest to lightest |
 | `--bone` / `--bone-2` / `--bone-3` | `#F2EBDB` / `#E6DDC6` / `#D2C6A6` | Text and card surfaces |
-| `--gold` | `#E8B84A` | Primary accent, focus rings, primary buttons |
-| `--blood` | `#C2392E` | Errors and destructive actions |
+| `--gold` | `#E8B84A` | Accent: kickers, links, focus rings, secondary buttons |
+| `--blood` | `#C2392E` | Primary buttons (as on NEWU), wordmark accent, errors |
+| `--muted` | `#B3A88D` | Secondary text (7.8:1 on `--ink`); the only token not in NEWU |
 | `--cash` | `#4FB36A` | Success, "Open playtest" badge |
 | `--display` | Archivo Black | Wordmark and headings |
 | `--sans` | Archivo 400–900 | Body |
 | `--mono` | JetBrains Mono | Times, codes, admin tables |
 
-The logo is a text wordmark in Archivo Black until Tyler provides one. Text contrast must meet WCAG AA.
+Buttons are NEWU's slanted uppercase buttons (`.btn primary / gold / cash / ghost`). The logo is a text wordmark in Archivo Black until Tyler provides one. Text contrast must meet WCAG AA; the tightest pair is bone on the red primary button at 4.51:1.
 
 ---
 
@@ -265,6 +270,11 @@ All paths are under `https://api.gametronyx.com/api`. `/auth/*` is also reachabl
 | `GET/POST /admin/invite-codes` `{count, note?}` | admin | List codes / mint one-off codes |
 | `POST /admin/invite-codes/{id}/revoke` | admin | Revoke an unused one-off code |
 | `GET/POST /admin/invite-codes/master` `{code?}` | admin | Show the master code / rotate it (custom or generated) |
+| `GET /games` | none | Showcase and launcher games. Never includes `play_url`; `launchable` says which get a Play button (M2) |
+| `POST /invite-requests` `{name, email, game_interest?, message?, website}` | none | "Request an invite"; `website` is a honeypot. Always `202` (M2) |
+| `GET /admin/invite-requests` | admin | Pending first, then handled (M2) |
+| `POST /admin/invite-requests/{id}/approve` | admin | Mints a one-off code and emails a `/join#code=…` link (M2) |
+| `POST /admin/invite-requests/{id}/decline` | admin | Silent decline (M2) |
 
 Errors come back as `{detail: "<message>"}` with `400` (bad input), `401` (no or expired session), `403` (disabled account or not an admin), `404`, `409` (username or email taken) or `429` (rate limited, with `Retry-After`). The site shows its own friendly copy for invite-code errors (§5.3).
 
@@ -480,6 +490,7 @@ Steps that need Tyler's accounts or root SSH on the server:
 1. **GitHub**
    - Make `TylerBielman/gametronyx` public **at launch** (it stays private while we build).
    - Settings → Pages → Source: GitHub Actions; custom domain `gametronyx.com`; Enforce HTTPS.
+   - Settings → Secrets and variables → Actions → Variables: `PAGES_ENABLED` = `true`. Then push to `main` or re-run the workflow.
    - Install the Claude GitHub App on the repo so agents can push.
 2. **GoDaddy DNS**
    - Apex `A` records `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`, and the matching `AAAA` records.
@@ -523,7 +534,7 @@ Steps that need Tyler's accounts or root SSH on the server:
 
 ## 14. Milestones
 1. **M1 Accounts API** (*built* on EFdungeon branch `claude/exciting-cray-m4hq8k`; not yet deployed): migration `0006`; email, role and rate limits; login `is_active` fix; invite master and revoke; reset; email confirmation; handoff; CORS; the `api.gametronyx.com` vhost; the notifications timer. The `settings`, `invite_requests`, `feedback` and playtest tables arrive with the milestones that use them.
-2. **M2 Site shell**: repo scaffold, NEWU tokens, showcase, join, login, reset, privacy, Pages deploy on `gametronyx.com`.
+2. **M2 Site shell** (*built*; the API half is on the same EFdungeon branch as M1): repo scaffold, NEWU tokens, showcase, request-invite, join, login, add-email, reset, verify-email, privacy, `/play` launcher and `/me`, plus the Pages workflow. Deploys once the repo is public and `PAGES_ENABLED` is set.
 3. **M3 Launcher**: `/play`, handoff in NEWU and Jerboa, removal of NEWU's basic auth.
 4. **M4 Feedback**: `feedback` API and GitHub issues; the Jerboa popup with tests.
 5. **M5 Scheduling**: slots, signups and waitlist; `/schedule` and My sessions; the timer; confirmation, reminder and Discord emails with `.ics`; Discord Scheduled Events.
