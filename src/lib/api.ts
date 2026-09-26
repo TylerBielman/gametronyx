@@ -111,7 +111,7 @@ interface RequestOptions {
   token?: string | null;
 }
 
-async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
+export async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   const headers: Record<string, string> = { Accept: 'application/json' };
   let body: BodyInit | undefined;
   if (opts.json !== undefined) {

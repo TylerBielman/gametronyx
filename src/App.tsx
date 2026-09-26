@@ -1,5 +1,14 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
+import RequireAdmin from './components/RequireAdmin';
+import AdminActivity from './pages/admin/Activity';
+import AdminCodes from './pages/admin/Codes';
+import AdminGames from './pages/admin/Games';
+import AdminLayout from './pages/admin/AdminLayout';
+import AdminPlayers from './pages/admin/Players';
+import AdminRequests from './pages/admin/Requests';
+import AdminSettings from './pages/admin/Settings';
+import AdminSlots from './pages/admin/Slots';
 import RequireAuth from './components/RequireAuth';
 import AddEmail from './pages/AddEmail';
 import Join from './pages/Join';
@@ -67,6 +76,23 @@ export default function App() {
             </RequireAuth>
           }
         />
+        <Route
+          path="/admin"
+          element={
+            <RequireAdmin>
+              <AdminLayout />
+            </RequireAdmin>
+          }
+        >
+          <Route index element={<Navigate to="/admin/activity" replace />} />
+          <Route path="activity" element={<AdminActivity />} />
+          <Route path="players" element={<AdminPlayers />} />
+          <Route path="codes" element={<AdminCodes />} />
+          <Route path="requests" element={<AdminRequests />} />
+          <Route path="games" element={<AdminGames />} />
+          <Route path="slots" element={<AdminSlots />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>

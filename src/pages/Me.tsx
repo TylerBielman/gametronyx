@@ -126,6 +126,11 @@ export default function Me() {
       <PageHeader kicker="Your account" title={user?.username ?? 'Account'}>
         Your username can't be changed here. It's the same on No Easy Way Up.
       </PageHeader>
+      {user?.role === 'admin' && (
+        <Link to="/admin" className="btn gold mb-6 w-full">
+          Open admin
+        </Link>
+      )}
       <MySessions />
       <EmailForm />
       <PasswordForm />

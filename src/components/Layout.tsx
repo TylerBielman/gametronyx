@@ -35,6 +35,11 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <NavLink to="/schedule" className={navClass}>
                   Schedule
                 </NavLink>
+                {user.role === 'admin' && (
+                  <NavLink to="/admin" className={(state) => `${navClass(state)} hidden sm:inline`}>
+                    Admin
+                  </NavLink>
+                )}
                 <NavLink
                   to="/me"
                   className={(state) => `${navClass(state)} inline-block max-w-[10rem] truncate align-middle`}

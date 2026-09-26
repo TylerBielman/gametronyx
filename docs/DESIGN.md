@@ -285,6 +285,10 @@ All paths are under `https://api.gametronyx.com/api`. `/auth/*` is also reachabl
 | `GET/POST /admin/playtests/slots/{id}/roster` · `DELETE …/roster/{signup_id}` | admin | Roster; add a player by username or email; remove (promotes) (M5) |
 | `GET /admin/discord/channels` | admin | Voice channels, loaded through the bot (M5) |
 | `GET/PUT /admin/settings` | admin | Discord server ID and invite, slot defaults, alert toggles, and which secrets are configured (M5) |
+| `GET /admin/players?q=` · `PATCH /admin/players/{id}` `{email?, is_active?, role?}` | admin | Search and edit players; disabling signs them out (M6) |
+| `POST /admin/players/{id}/password` · `POST …/{id}/logout` · `DELETE /admin/players/{id}?confirm=<username>` | admin | Temporary password, force log-out, delete (M6) |
+| `GET/POST /admin/games` · `PATCH /admin/games/{id}` | admin | All games; add; edit (the slug is fixed) (M6) |
+| `GET /admin/activity?type=&before_id=` · `GET /admin/activity/types` | admin | Activity feed, newest first (M6) |
 
 Errors come back as `{detail: "<message>"}` with `400` (bad input), `401` (no or expired session), `403` (disabled account or not an admin), `404`, `409` (username or email taken) or `429` (rate limited, with `Retry-After`). The site shows its own friendly copy for invite-code errors (§5.3).
 
@@ -548,5 +552,5 @@ Steps that need Tyler's accounts or root SSH on the server:
 3. **M3 Launcher** (*built*: NEWU on the EFdungeon branch, Jerboa on 3-minutes-to-midnight's `claude/exciting-cray-m4hq8k`): `/play`, handoff in NEWU and Jerboa, and NEWU's basic auth removed from the repo configs. The live nginx edit is checklist step C7.
 4. **M4 Feedback** (*built*): `POST /api/feedback`, GitHub issues with retries (EFdungeon branch); the Jerboa popup with tests (3-minutes-to-midnight branch).
 5. **M5 Scheduling** (*built*: API on the EFdungeon branch, pages here): slots, signups and waitlist; `/schedule` and My sessions; the timer; confirmation, reminder and Discord emails with `.ics`; Discord Scheduled Events. Creating sessions needs the admin UI (M6), or the admin API until then.
-6. **M6 Admin**: all tabs, activity feed and settings.
+6. **M6 Admin** (*built*): `/admin` with Activity, Players, Invite codes, Requests, Games, Sessions (with rosters) and Settings. It works at phone width. Admins reach it from `/me` (Open admin) or, on wider screens, the header.
 7. **M7 Launch**: the §12 checklist and smoke test; invite the first playtesters.

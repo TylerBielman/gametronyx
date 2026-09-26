@@ -14,7 +14,7 @@ Keep secrets in your password manager. Never paste them into GitHub, Discord or 
 | Resend API key (`re_…`) | A1 | C2 `RESEND_API_KEY_GTX` |
 | GitHub fine-grained token (`github_pat_…`) | A4 | C2 `GTX_GITHUB_TOKEN` |
 | Discord bot token | A5 | C2 `DISCORD_BOT_TOKEN` |
-| Discord server ID and permanent invite link | A5 | Gametronyx admin → Settings (M6) |
+| Discord server ID and permanent invite link | A5 | Gametronyx Admin → Settings |
 | A reply-to address for playtest emails | you | C2 `EMAIL_REPLY_TO` |
 
 ---
@@ -166,13 +166,15 @@ You don't need to create labels: the API creates missing ones itself.
 5. Log out. Use **Forgot password?** with your email and follow the emailed link.
 6. In a private window, **Request an invite** with a second email address.
    - You should get the admin email.
-   - Approve it (admin UI in M6; until then run `curl` against `/api/admin/invite-requests/{id}/approve`, or ask me).
+   - Approve it in **Admin → Requests**.
    - The requester email arrives with a `/join#code=…` link. Create the account.
 
 ## Part F — after launch
 
-- **Rotate the master code.** `NOEASYWAYUP` has been shared widely and appears in the EFdungeon repo. Do this in the Gametronyx admin (M6), or from the command line:
+- **Rotate the master code.** `NOEASYWAYUP` has been shared widely and appears in the EFdungeon repo. Use **Admin → Invite codes → Rotate**, or the command line:
   ```bash
   ssh root@noeasywayup.com 'cd /opt/efdungeon-accounts/backend && docker compose -f docker-compose.prod.yml exec api python -m scripts.invite_codes rotate'
   ```
-- **One-off codes for specific people:** `... python -m scripts.invite_codes make 5 "Discord crew"`
+- **One-off codes for specific people:** **Admin → Invite codes → Mint codes**, with a note saying who they're for.
+- **Discord:** in **Admin → Settings**, paste the server ID and permanent invite from A5. Then **Admin → Sessions → New session** can pick the voice channel.
+- **First Red Ring sessions:** in **Admin → Sessions → New session**, choose a time, seats and channel, and add session notes. "Repeat weekly" creates a series.
