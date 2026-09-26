@@ -33,10 +33,13 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      # Only when Pages is on: an unused artifact still counts against the
+      # account's shared Actions storage quota (private repos, free plan).
       - uses: actions/upload-pages-artifact@v3
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.PAGES_ENABLED == 'true'
         with:
           path: dist
+          retention-days: 1
 
   deploy:
     needs: build
