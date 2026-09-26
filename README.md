@@ -11,6 +11,7 @@ This repo is the static front end (React + Vite + TypeScript + Tailwind, GitHub 
 ## Documents
 - [Design and technical spec](docs/DESIGN.md), including the API reference (§5.9) and milestones (§14)
 - [Decision ledger](docs/DECISIONS.md)
+- [Launch checklist](docs/LAUNCH_CHECKLIST.md): the steps only Tyler can do (accounts, DNS, server, go-live)
 - [Original brief, filled in (.docx)](docs/Gametronyx_site_design.docx)
 
 ## Develop
