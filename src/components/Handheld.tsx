@@ -31,8 +31,8 @@ function DPad() {
 }
 
 /**
- * The GT-01: the home page hero. A and B (and Start) are the real actions,
- * and the LCD spells out which key does what.
+ * The GT-01: the home page hero. A, B and the small ▶ key are the real
+ * actions, and the LCD spells out which key does what.
  */
 export default function Handheld({ a, b, start }: { a: Key; b: Key; start?: Key }) {
   return (
@@ -103,13 +103,12 @@ export default function Handheld({ a, b, start }: { a: Key; b: Key; start?: Key 
 
       {start && (
         <div className="mt-5 flex justify-center pb-1">
-          <Link to={start.to} className="group flex flex-col items-center gap-1.5 text-fg no-underline">
+          <Link to={start.to} className="group flex flex-col items-center gap-2 text-fg no-underline">
             <span
               aria-hidden="true"
-              className="block h-4 w-14 -rotate-[18deg] rounded-full bg-[#6f6a5d] shadow-[0_3px_0_#454137] transition-transform group-active:translate-y-0.5"
-            />
-            <span className="font-mono text-[11px] tracking-[0.16em] text-fg-3" aria-hidden="true">
-              START
+              className="grid h-7 w-16 place-items-center rounded-full bg-[#6f6a5d] text-xs text-paper shadow-[0_3px_0_#454137] transition-transform group-active:translate-y-0.5 group-active:shadow-none"
+            >
+              ▶
             </span>
             <span className="rounded-xl border-2 border-char px-3 py-1 font-display text-[15px] uppercase tracking-wide">
               {start.label}

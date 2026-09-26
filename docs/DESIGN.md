@@ -136,7 +136,7 @@ The whole site is mobile-first, since most playtests happen on phones.
 ### 4.1 Public (not logged in)
 | Route | Content |
 |---|---|
-| `/` | **Showcase**. The GT-01 handheld (§4.4). Its A, B and Start keys are **Request invite**, **Log in** and **I have a code**. Operating instructions sit beside it. Game cartridges show art, name, one-line pitch and status ("Open playtest" / "Scheduled sessions" / "Coming soon"). Link-outs to Tyler's other sites are covered in §11. |
+| `/` | **Showcase**. The GT-01 handheld (§4.4). Its A, B and ▶ keys are **Request invite**, **Log in** and **I have a code**. Operating instructions sit beside it. Game cartridges show art, name, one-line pitch and status ("Open playtest" / "Scheduled sessions" / "Coming soon"). Link-outs to Tyler's other sites are covered in §11. |
 | `/request-invite` | Form: name, email, "Which game are you interested in?" (optional), "Anything you'd like Tyler to know?" (optional). It has a hidden honeypot field and is rate-limited. The page then says "Thanks, Tyler will email you an invite code if there's room." |
 | `/join` | Step 1: invite code, prefilled from `/join#code=…` in an approved-invite email. Step 2: email, username, password and password confirmation, plus a line linking the privacy notice. It then logs the player in and goes to `/play`. |
 | `/login` | Username **or** email, plus password. Links to "Forgot password?" and "I have an invite code". |
@@ -163,8 +163,8 @@ The whole site is mobile-first, since most playtests happen on phones.
 The site is an ironic 80s Eastern-bloc games bureau: the home page is a beige handheld, the "GT-01", and each game is a cartridge (U21). Tyler's logo (`public/brand/gametronyx-logo.webp`) sits in the charcoal header and on the handheld. The catchphrase is **"We kill your high score in the face!"**
 
 - **Home page.** The handheld's LCD carries the catchphrase and spells out the controls. The keys are the real actions:
-  - Signed out: **A** = Request invite, **B** = Log in, **Start** = I have a code.
-  - Signed in: **A** = Play, **B** = Schedule, **Start** = My account.
+  - Signed out: **A** = Request invite, **B** = Log in, and a small **▶** key = I have a code.
+  - Signed in: **A** = Play, **B** = Schedule, **▶** = My account.
   - Beside it, the "Operating instructions" explain the same steps.
 - **Cartridges.** A game card has grip ridges and a paper label. It shows the game's art, its catalogue number (GT-02, GT-03, GT-04), the pitch and a status line. Art comes from the game's `art_url` if admin set one, else the built-in images in `public/art/<slug>.webp`.
 - **Faux-Soviet lettering.** Decorative labels swap in Cyrillic look-alikes (Д for A, И for N, Ф for O, Я for R, Ш for W): "MФDEL GT-01", "ФPEЯДTIИG MДИUДL". It is not a real language (U21). Anything a player must read or tap stays plain English, and screen readers get the plain English (`<Faux>`).

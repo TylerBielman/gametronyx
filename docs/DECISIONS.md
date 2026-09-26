@@ -76,7 +76,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | A42 | A signup waitlisted after the 4-hour mark gets no reminder; one promoted inside 15 minutes gets the Discord email at once | Consistent with A21 |
 | A43 | The server go-live is one root command on the box (`gametronyx-go-live.sh`), with the code staged by the box's own Actions runner | Tyler has no bash or rsync on his desktop. Claude stages; Tyler pulls the trigger (EFdungeon's RED lane) |
 | A44 | Removing NEWU's basic auth needs a telemetry decision first | `POST /api/telemetry` has its own basic auth and relies on browsers holding the playtest credential |
-| A45 | GT-01 details: the signed-out keys are A = Request invite, B = Log in and Start = I have a code; signed in, A = Play, B = Schedule and Start = My account. Faux letters swap A, N, O, R and W only; the key letters use the headline font | Keeps faux words readable; the Start key keeps the invite-code path one tap away |
+| A45 | GT-01 details: the signed-out keys are A = Request invite, B = Log in and a level ▶ key = I have a code; signed in, A = Play, B = Schedule and ▶ = My account. Faux letters swap A, N, O, R and W only; the key letters use the headline font | Keeps faux words readable; the ▶ key keeps the invite-code path one tap away. Tyler asked for it level and labelled "I have a code", not "Start" |
 
 ## Open items
 None block the design. Values Tyler supplies at setup (DESIGN §12): the Discord server ID and invite, the bot token, the Resend key, the GitHub token, and the GoDaddy DNS records.

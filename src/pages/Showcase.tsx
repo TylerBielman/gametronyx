@@ -9,7 +9,7 @@ import { useGames } from '../lib/useGames';
 
 const GUEST_STEPS = [
   'Press A to request an invitation from the bureau.',
-  'Got a code already? Press Start to make your account.',
+  'Got an invite code already? Press “I have a code” to make your account.',
   'Press B to log in. Your No Easy Way Up account already works.',
   'Insert a cartridge. Lose your high score. Tell us how it felt.',
 ];
@@ -55,13 +55,13 @@ export default function Showcase() {
           <Handheld
             a={{ to: '/play', label: 'Play', prompt: 'Press A to play' }}
             b={{ to: '/schedule', label: 'Schedule', prompt: 'Press B for the schedule' }}
-            start={{ to: '/me', label: 'My account', prompt: 'Start: your account' }}
+            start={{ to: '/me', label: 'My account', prompt: 'Press ▶ for your account' }}
           />
         ) : (
           <Handheld
             a={{ to: '/request-invite', label: 'Request invite', prompt: 'Press A to request an invite' }}
             b={{ to: '/login', label: 'Log in', prompt: 'Press B to log in' }}
-            start={{ to: '/join', label: 'I have a code', prompt: 'Have a code? Press Start' }}
+            start={{ to: '/join', label: 'I have a code', prompt: 'Have a code? Press ▶' }}
           />
         )}
 
