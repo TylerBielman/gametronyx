@@ -138,7 +138,8 @@ The whole site is mobile-first, since most playtests happen on phones.
 | `/request-invite` | Form: name, email, "Which game are you interested in?" (optional), "Anything you'd like Tyler to know?" (optional). It has a hidden honeypot field and is rate-limited. The page then says "Thanks, Tyler will email you an invite code if there's room." |
 | `/join` | Step 1: invite code. Step 2: email, username, password and password confirmation, plus a line linking the privacy notice. It then logs the player in and goes to `/play`. |
 | `/login` | Username **or** email, plus password. Links to "Forgot password?" and "I have an invite code". |
-| `/reset` and `/reset/:token` | Request a reset link by email, then set a new password. |
+| `/reset` | Request a reset link by email. `/reset#token=…` (the emailed link) sets a new password. Tokens ride in the URL fragment so they never reach a server log. |
+| `/verify-email#token=…` | Confirms the player's email from the welcome or change-of-email message. Works without being logged in. |
 | `/privacy` | Short privacy notice (§10.3). |
 
 ### 4.2 Player (logged in)
@@ -199,7 +200,7 @@ The existing `invite_codes` table already models both kinds of code:
 2. Enter email, username and password, then `POST /api/auth/register` with `{invite_code, email, username, password}`. In one transaction it creates the user and redeems the code (single-use codes are marked redeemed).
 3. The server returns a JWT. The site stores it and goes to `/play`, then sends a welcome email.
 
-Email verification *(agent)*: v1 does not block on verification. The welcome email includes a "confirm this is you" link that sets `email_verified_at`. Admin sees who is unverified.
+Email verification *(agent)*: v1 does not block on verification. The welcome email includes a "confirm this is you" link (`/verify-email#token=…`, valid 7 days) that sets `email_verified_at`. Changing the email voids the old link and sends a new one. Admin sees who is unverified.
 
 ### 5.4 Invite requests (public)
 - `POST /api/invite-requests` stores the name, email and notes, then emails Tyler (a toggle in admin settings).
@@ -208,7 +209,8 @@ Email verification *(agent)*: v1 does not block on verification. The welcome ema
 
 ### 5.5 Password reset
 - `POST /api/auth/reset/request` accepts an email. The response is the same whether or not the email exists.
-- It emails a one-time link that is valid for 1 hour. The token is stored hashed.
+- It emails a one-time link (`/reset#token=…`) that is valid for 1 hour. The token is stored hashed.
+- Setting the new password burns every outstanding link for the account and signs out all other sessions, on NEWU too.
 - For players who have no email yet, admin can set a temporary password from the Players tab and tell them directly.
 
 ### 5.6 Launching games (login handoff)
@@ -217,7 +219,7 @@ Game sites live on other origins, so they cannot read Gametronyx's `localStorage
 1. The player taps **Play**. The site calls `POST /api/auth/handoff {game_slug}` and gets back a random code, stored hashed, that is **single-use and valid for 60 seconds**.
 2. The browser opens `<game play_url>#gtx_handoff=<code>`.
 3. The game reads the fragment, strips it with `history.replaceState`, and calls `POST /api/auth/handoff/redeem {code}`, which returns a normal JWT.
-4. The game logs a `game_launched` activity event.
+4. The API logs a `game_launched` activity event when it issues the code.
 
 Per game:
 - **NEWU**: its `authClient` redeems the code and stores the JWT under its existing `ef_auth_token_v1` key, so the player arrives logged in.
@@ -231,15 +233,40 @@ The gate is **launcher-only for now** (Tyler's decision; it may be tightened lat
 - Hardening later (a game-side login check, or builds served only to signed-in players) is listed in §13.
 
 ### 5.8 Rate limits *(agent)*
-In-memory per-process limits are enough at this scale, because there is a single API container.
+In-memory per-process limits are enough at this scale, because there is a single API container. They key on the `X-Real-IP` header nginx sets, never on `X-Forwarded-For`, whose first hop the client controls. If a request arrives without `X-Real-IP` (a misconfigured proxy), the per-IP-only buckets switch off rather than lumping every player into one bucket.
 
 | Endpoint | Limit |
 |---|---|
-| login | 10 attempts / 15 min per IP + username, and 50 / 15 min per IP |
+| login | 10 **failed** attempts / 15 min per IP + username, and 50 attempts / 15 min per IP |
 | invite check / register | 20 / hour per IP |
 | reset request | 5 / hour per IP |
-| invite request | 3 / day per IP |
-| feedback | 10 / hour per user |
+| resend confirmation email | 3 / hour per account |
+| handoff redeem | 60 / minute per IP |
+| invite request (M2) | 3 / day per IP |
+| feedback (M4) | 10 / hour per user |
+
+### 5.9 Account API (built in M1)
+All paths are under `https://api.gametronyx.com/api`. `/auth/*` is also reachable same-origin at `noeasywayup.com/api/auth/*`.
+
+| Method and path | Auth | Purpose |
+|---|---|---|
+| `POST /auth/invite/check` `{invite_code}` | none | Step 1 of `/join` |
+| `POST /auth/register` `{invite_code, username, password, email?, timezone?}` | none | Create an account; returns `{access_token}` |
+| `POST /auth/login` (form: `username`, `password`) | none | Username **or** email; returns `{access_token}` |
+| `GET /auth/me` | player | `id, username, email, email_verified, needs_email, role, timezone, reminder_default` |
+| `PATCH /auth/me` `{email?, timezone?, reminder_default?}` | player | Add or change email (sends a confirmation), time zone, reminder default |
+| `POST /auth/me/password` `{current_password, new_password}` | player | Returns a fresh token; other sessions are signed out |
+| `POST /auth/email/verify` `{token}` | none | From the `/verify-email#token=…` link |
+| `POST /auth/email/verify/resend` | player | Resend the confirmation email |
+| `POST /auth/reset/request` `{email}` | none | Always `202`, whether or not the email has an account |
+| `POST /auth/reset/confirm` `{token, password}` | none | Returns `{access_token}` |
+| `POST /auth/handoff` `{game_slug}` | player | Returns `{code, expires_in, launch_url}` |
+| `POST /auth/handoff/redeem` `{code}` | none | Called by the game; returns `{access_token}` |
+| `GET/POST /admin/invite-codes` `{count, note?}` | admin | List codes / mint one-off codes |
+| `POST /admin/invite-codes/{id}/revoke` | admin | Revoke an unused one-off code |
+| `GET/POST /admin/invite-codes/master` `{code?}` | admin | Show the master code / rotate it (custom or generated) |
+
+Errors come back as `{detail: "<message>"}` with `400` (bad input), `401` (no or expired session), `403` (disabled account or not an admin), `404`, `409` (username or email taken) or `429` (rate limited, with `Retry-After`). The site shows its own friendly copy for invite-code errors (§5.3).
 
 ---
 
@@ -395,7 +422,7 @@ These are Postgres tables in the existing `efdungeon` database. The changes ship
 | `feedback` | `id`, `user_id`, `game_id`, `text`, `build_sha`, `runs`, `client_json`, `issue_url`, `attempts`, `created_at` |
 | `activity_events` | `id`, `at`, `actor_user_id`, `type`, `game_id`, `subject_user_id`, `details_json` |
 | `settings` | `key`, `value_json` |
-| `email_outbox` | `id`, `to`, `template`, `payload_json`, `status`, `attempts`, `last_error`, `send_after`, `sent_at` |
+| `email_outbox` | `id`, `to_email`, `template`, `payload_json`, `status` (`pending` \| `sending` \| `sent` \| `failed` \| `disabled`), `attempts`, `last_error`, `provider_id`, `send_after`, `sent_at`, `created_at`, `updated_at` |
 | `playtest_slots` | `id`, `game_id`, `starts_at` (timestamptz), `duration_min`, `capacity`, `discord_channel_id`, `discord_channel_name`, `discord_event_id`, `notes`, `status` (`draft` \| `open` \| `cancelled` \| `completed`), `event_started_at`, `event_completed_at`, `created_by`, `created_at`, `updated_at` |
 | `playtest_signups` | `id`, `slot_id`, `user_id`, `status` (`confirmed` \| `waitlisted` \| `cancelled` \| `expired`), `remind_4h`, `reminded_4h_at`, `join_sent_at`, `created_at`, `promoted_at`, `cancelled_at`. Unique on (`slot_id`, `user_id`) while confirmed or waitlisted; the waitlist is ordered by `created_at` |
 
@@ -495,7 +522,7 @@ Steps that need Tyler's accounts or root SSH on the server:
 ---
 
 ## 14. Milestones
-1. **M1 Accounts API**: migrations `0006+`; email, role and rate limits; login `is_active` fix; invite master and revoke; reset; handoff; CORS; `api.gametronyx.com`.
+1. **M1 Accounts API** (*built* on EFdungeon branch `claude/exciting-cray-m4hq8k`; not yet deployed): migration `0006`; email, role and rate limits; login `is_active` fix; invite master and revoke; reset; email confirmation; handoff; CORS; the `api.gametronyx.com` vhost; the notifications timer. The `settings`, `invite_requests`, `feedback` and playtest tables arrive with the milestones that use them.
 2. **M2 Site shell**: repo scaffold, NEWU tokens, showcase, join, login, reset, privacy, Pages deploy on `gametronyx.com`.
 3. **M3 Launcher**: `/play`, handoff in NEWU and Jerboa, removal of NEWU's basic auth.
 4. **M4 Feedback**: `feedback` API and GitHub issues; the Jerboa popup with tests.

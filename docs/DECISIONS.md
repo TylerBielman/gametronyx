@@ -53,6 +53,13 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | A22 | `users.timezone` is captured from the browser; emails and pages show local times; admin enters times in their own zone, stored as UTC | Players and Tyler may be in different zones |
 | A23 | Voice channel is picked from a bot-loaded dropdown; one permanent server invite in Settings (not one per session) | Fewer moving parts; the bot already has access |
 | A24 | Slot defaults: 60 minutes, 6 seats (admin settings). Seats can't drop below the confirmed count; time or channel edits email everyone signed up and update the Discord event | Settings, not questions |
+| A25 | Reset and confirmation links carry their token in the URL fragment (`/reset#token=…`, `/verify-email#token=…`) | Fragments never reach a server log (GitHub Pages included) |
+| A26 | `game_launched` is logged when the API issues the handoff code, not when the game redeems it | One place to log it; no game-side code needed |
+| A27 | Login tries the username first and falls back to email only when the input contains `@` | Existing NEWU usernames keep working even if one contains `@` |
+| A28 | Rate limits key on nginx's `X-Real-IP`; per-IP-only buckets switch off for loopback; the login lockout counts failures only | `X-Forwarded-For` is spoofable; a proxy misconfiguration shouldn't lock every player out |
+| A29 | Without `RESEND_API_KEY_GTX`, emails are marked `disabled` instead of queued | Stale reset links shouldn't fire once a key is added |
+| A30 | The API keeps NEWU's specific invite errors ("Invalid invite code", "Invite code already used"); the Gametronyx UI shows one generic message | NEWU's client and tests depend on the specific messages |
+| A31 | Fixed a pre-existing bug found while testing: over-size saves and bug reports returned 500 instead of 413 | Separate commit on the same branch; test-provable |
 
 ## Open items
 None block the design. Values Tyler supplies at setup (DESIGN §12): the Discord server ID and invite, the bot token, the Resend key, the GitHub token, and the GoDaddy DNS records.
