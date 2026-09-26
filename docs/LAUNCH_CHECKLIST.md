@@ -101,51 +101,33 @@ You don't need to create labels: the API creates missing ones itself.
 
 ---
 
-## Part B — review and merge the code
+## Part B — merge the code ✅ done 2026-09-26
 
-1. **EFdungeon PR** [#1620](https://github.com/TylerBielman/EFdungeon/pull/1620) (accounts API plus NEWU changes): review it, click **Ready for review**, then merge. If anything should change, just ask.
-2. **3-minutes-to-midnight**: merge branch `claude/exciting-cray-m4hq8k` into `main`, which contains the Jerboa launch handoff and feedback popup. Jerboa redeploys automatically on push to `main`.
-3. **gametronyx**: `main` is already up to date. There is nothing to merge unless new work lands on the branch.
+- EFdungeon [#1620](https://github.com/TylerBielman/EFdungeon/pull/1620) (accounts API plus NEWU changes): merged. Merging doesn't deploy anything.
+- 3-minutes-to-midnight [#3](https://github.com/TylerBielman/3-minutes-to-midnight/pull/3) (Jerboa launch handoff and feedback popup): merged, and Jerboa redeployed itself.
 
-## Part C — server (from your desktop, needs root SSH)
+## Part C — server (any SSH client; nothing to install on your computer)
 
-1. In your EFdungeon checkout: `git checkout main && git pull`.
-2. **Secrets.** SSH into the box and edit the env file:
+1. **Secrets** ✅ done. For reference: SSH into the box (`ssh root@noeasywayup.com` works from Windows PowerShell or macOS Terminal) and edit the env file:
    ```bash
-   ssh root@noeasywayup.com
    nano /opt/efdungeon-accounts/backend/.env.production
    ```
-   Append these lines and save:
+   Append these lines (no spaces around `=`, no quotes), then save with **Ctrl+O**, **Enter**, **Ctrl+X**:
    ```
    RESEND_API_KEY_GTX=re_...
    EMAIL_REPLY_TO=you@example.com
    GTX_GITHUB_TOKEN=github_pat_...
-   DISCORD_BOT_TOKEN=...
+   DISCORD_BOT_TOKEN=...          # optional; add it whenever
    ```
-3. **Deploy the API** from the repo root on your desktop:
+2. **Stage the code on the box.** GitHub → EFdungeon → **Actions** → **stage accounts server** → **Run workflow**. The box's own runner checks out `main`. Nothing is built or shipped, and Claude can run this step for you.
+3. **Go live: one command.** SSH into the box and paste:
    ```bash
-   bash deploy/accounts-server/deploy.sh
+   bash /opt/actions-runner/_work/EFdungeon/EFdungeon/deploy/accounts-server/gametronyx-go-live.sh
    ```
-   Check it with `curl -fsS https://noeasywayup.com/api/health` → `{"ok":true}`.
-   Migrations run automatically, and NEWU's shared invite code becomes the master code.
-4. **api.gametronyx.com**, once `nslookup api.gametronyx.com` shows your server IP:
-   ```bash
-   scp deploy/accounts-server/nginx-api-gametronyx.conf root@noeasywayup.com:/etc/nginx/sites-available/api.gametronyx.com
-   ssh root@noeasywayup.com 'ln -sf /etc/nginx/sites-available/api.gametronyx.com /etc/nginx/sites-enabled/ && nginx -t && systemctl reload nginx && certbot --nginx -d api.gametronyx.com'
-   curl -fsS https://api.gametronyx.com/api/health
-   ```
-5. **Make yourself admin**, using your existing NEWU username:
-   ```bash
-   ssh root@noeasywayup.com 'cd /opt/efdungeon-accounts/backend && docker compose -f docker-compose.prod.yml exec api python -m scripts.make_admin YOUR_USERNAME'
-   ```
-6. **Email timer and nightly backup**: follow steps 6–7 of the "Gametronyx M1" section in `EFdungeon/deploy/accounts-server/install.md`.
-7. **No Easy Way Up: ship the launch handoff and drop the browser password.**
-   1. Deploy the NEWU front end. Either run `bash deploy/deploy.sh` from your desktop, or use GitHub → EFdungeon → **Actions** → **Deploy** → **Run workflow** with `confirm` = `ship`.
-   2. Remove the shared basic-auth prompt on the box:
-      ```bash
-      ssh root@noeasywayup.com "sed -i -E 's/^([[:space:]]*)(auth_basic \"EFdungeon playtest\";|auth_basic_user_file \/etc\/nginx\/.htpasswd-noeasywayup;)/\1# \2/' /etc/nginx/sites-available/noeasywayup.com && nginx -t && systemctl reload nginx"
-      curl -sI https://noeasywayup.com | head -1    # HTTP/2 200 (no longer 401)
-      ```
+   When asked, type your No Easy Way Up username; that account becomes admin.
+   - It takes a few minutes, working through 7 numbered steps, and ends with **ALL DONE**. If it prints **STOPPED** or **FAIL**, copy everything it printed and send it to Claude.
+   - What it does: a safety backup of the player database, then the accounts API update, the `api.gametronyx.com` web server and certificate, the email timer, the nightly backup and your admin role, with a check of each.
+   - Safe to run again. It doesn't touch the NEWU game or its browser password.
 
 ## Part D — go live
 
@@ -162,7 +144,7 @@ You don't need to create labels: the API creates missing ones itself.
 1. Open <https://gametronyx.com>. The three game cards should load.
 2. **Log in** with your NEWU account. It should ask for your email once, then show `/play`.
 3. Tap **Play Jerboa**. The game opens, still logged in for feedback. Finish 3 runs and the feedback popup appears. **Send** it, then check the new issue in 3-minutes-to-midnight.
-4. Tap **Play No Easy Way Up**. It should open already logged in, with no browser password prompt.
+4. Tap **Play No Easy Way Up**. Until Part G is done it still shows the browser password prompt and asks you to log in; after Part G it opens already logged in.
 5. Log out. Use **Forgot password?** with your email and follow the emailed link.
 6. In a private window, **Request an invite** with a second email address.
    - You should get the admin email.
@@ -178,3 +160,21 @@ You don't need to create labels: the API creates missing ones itself.
 - **One-off codes for specific people:** **Admin → Invite codes → Mint codes**, with a note saying who they're for.
 - **Discord:** in **Admin → Settings**, paste the server ID and permanent invite from A5. Then **Admin → Sessions → New session** can pick the voice channel.
 - **First Red Ring sessions:** in **Admin → Sessions → New session**, choose a time, seats and channel, and add session notes. "Repeat weekly" creates a series.
+
+## Part G — No Easy Way Up (on hold)
+
+Held by Tyler on 2026-09-26. Gametronyx works without it: NEWU still launches, it just asks players to log in and keeps the browser password prompt.
+
+1. **Ship the NEWU front end with the launch handoff.**
+   - The repo side is merged, but a NEWU deploy ships everything on EFdungeon `main`, including unreleased NEWU work. Do this with your next NEWU release: GitHub → EFdungeon → **Actions** → **deploy** → **Run workflow**, with `confirm` = `ship`.
+2. **Remove the browser password (basic auth).**
+   - First decide how `POST /api/telemetry` is gated. It has its own basic auth and relies on players' browsers already holding the playtest password. Drop the site prompt alone and telemetry starts failing, and a browser may even prompt mid-run.
+   - Options:
+     - open it, with an nginx per-IP rate limit;
+     - move it behind the player's account token;
+     - retire it.
+   - After that:
+     ```bash
+     ssh root@noeasywayup.com "sed -i -E 's/^([[:space:]]*)(auth_basic \"EFdungeon playtest\";|auth_basic_user_file \/etc\/nginx\/.htpasswd-noeasywayup;)/\1# \2/' /etc/nginx/sites-available/noeasywayup.com && nginx -t && systemctl reload nginx"
+     curl -sI https://noeasywayup.com | head -1    # HTTP/2 200 (no longer 401)
+     ```

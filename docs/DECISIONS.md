@@ -24,6 +24,8 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | U16 | Scheduling | Use a free existing tool only if it is seamless for players. Research found none that meets the brief, so it is **built in** on the shared API (Cal.com Free was the runner-up; see DESIGN §7) |
 | U17 | Discord | Email carries the Discord details; **each slot is also posted as a Discord Scheduled Event** through a bot |
 | U18 | Repo visibility | Private while building; **public at launch** so GitHub Pages works on the free plan |
+| U19 | NEWU integration (2026-09-26) | **On hold.** No NEWU front-end deploy (it would ship unreleased NEWU work on `main`) and no basic-auth removal (live telemetry depends on it). Gametronyx launches without them; see LAUNCH_CHECKLIST Part G |
+| U20 | Discord (2026-09-26) | Skipped at launch; add the bot token and the server settings later |
 
 ## Agent calls (for Tyler's review)
 
@@ -71,6 +73,8 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | A40 | Sign-up needs an email on the account; the API refuses without one | The 15-minute Discord link is sent by email |
 | A41 | Emails carry times already formatted in each player's zone, stored in the outbox payload | A retried send says exactly what the first attempt would have |
 | A42 | A signup waitlisted after the 4-hour mark gets no reminder; one promoted inside 15 minutes gets the Discord email at once | Consistent with A21 |
+| A43 | The server go-live is one root command on the box (`gametronyx-go-live.sh`), with the code staged by the box's own Actions runner | Tyler has no bash or rsync on his desktop. Claude stages; Tyler pulls the trigger (EFdungeon's RED lane) |
+| A44 | Removing NEWU's basic auth needs a telemetry decision first | `POST /api/telemetry` has its own basic auth and relies on browsers holding the playtest credential |
 
 ## Open items
 None block the design. Values Tyler supplies at setup (DESIGN §12): the Discord server ID and invite, the bot token, the Resend key, the GitHub token, and the GoDaddy DNS records.
