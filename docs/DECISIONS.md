@@ -27,6 +27,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | U19 | NEWU integration (2026-09-26) | **On hold.** No NEWU front-end deploy (it would ship unreleased NEWU work on `main`) and no basic-auth removal (live telemetry depends on it). Gametronyx launches without them; see LAUNCH_CHECKLIST Part G |
 | U20 | Discord (2026-09-26) | Skipped at launch; add the bot token and the server settings later |
 | U21 | Look (2026-09-26) | **The 80s handheld** from the four mockups: an ironic old Eastern-bloc game company, with the catchphrase "We kill your high score in the face!" No real language: decorative text is **faux-Soviet lettering** only. No price stickers over the game art. The A and B keys must make it obvious what to press. Red Ring's card art is Tyler's hand screenshot |
+| U22 | Platforms (2026-09-26) | Cartridges say where each game runs: **Jerboa: mobile or desktop**; **No Easy Way Up and Red Ring: desktop only** |
 
 ## Agent calls (for Tyler's review)
 

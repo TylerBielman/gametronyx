@@ -12,6 +12,15 @@ export const CARTRIDGE_CODES: Record<string, string> = {
   'red-ring': 'GT-04',
 };
 
+// Where each game runs, shown on its cartridge (DECISIONS U22). A game not
+// listed here shows no platform tag.
+export type Platform = 'mobile_desktop' | 'desktop';
+export const PLATFORMS: Record<string, Platform> = {
+  jerboa: 'mobile_desktop',
+  'no-easy-way-up': 'desktop',
+  'red-ring': 'desktop',
+};
+
 // Faux-Soviet lettering: plain English with Cyrillic look-alikes swapped in.
 // It isn't a real language, only a look (DECISIONS U21).
 const FAUX: Record<string, string> = { A: 'Д', N: 'И', O: 'Ф', R: 'Я', W: 'Ш' };

@@ -166,7 +166,7 @@ The site is an ironic 80s Eastern-bloc games bureau: the home page is a beige ha
   - Signed out: **A** = Request invite, **B** = Log in, and a small **▶** key = I have a code.
   - Signed in: **A** = Play, **B** = Schedule, **▶** = My account.
   - Beside it, the "Operating instructions" explain the same steps.
-- **Cartridges.** A game card has grip ridges and a paper label. It shows the game's art, its catalogue number (GT-02, GT-03, GT-04), the pitch and a status line. Art comes from the game's `art_url` if admin set one, else the built-in images in `public/art/<slug>.webp`.
+- **Cartridges.** A game card has grip ridges and a paper label. It shows the game's art, its catalogue number (GT-02, GT-03, GT-04), a platform tag, the pitch and a status line. The platform tag is teal "Mobile or desktop" for Jerboa and red "Desktop only" for No Easy Way Up and Red Ring (U22). It is set per game in `src/lib/art.ts` (`PLATFORMS`). Art comes from the game's `art_url` if admin set one, else the built-in images in `public/art/<slug>.webp`.
 - **Faux-Soviet lettering.** Decorative labels swap in Cyrillic look-alikes (Д for A, И for N, Ф for O, Я for R, Ш for W): "MФDEL GT-01", "ФPEЯДTIИG MДИUДL". It is not a real language (U21). Anything a player must read or tap stays plain English, and screen readers get the plain English (`<Faux>`).
 - **Tokens** (`src/styles/index.css`):
 
