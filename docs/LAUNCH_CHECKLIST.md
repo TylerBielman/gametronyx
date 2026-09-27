@@ -179,9 +179,9 @@ Held by Tyler on 2026-09-26. Gametronyx works without it: NEWU still launches, i
      curl -sI https://noeasywayup.com | head -1    # HTTP/2 200 (no longer 401)
      ```
 
-## Part H — leaderboard server (scores.gametronyx.com)
+## Part H — leaderboard server (scores.gametronyx.com) ✅ done 2026-09-27
 
-Needs Part C done (the accounts API running on the box). About 10 minutes, any SSH client.
+Needs Part C done (the accounts API running on the box). About 10 minutes, any SSH client. Kept below for reinstalls; for changes, use **Updates** and **New season**.
 
 ### H1. DNS
 This tells the internet that `scores.gametronyx.com` lives on the same server as `api.gametronyx.com`.

@@ -99,3 +99,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 
 ## Open items
 None block the design. Values Tyler supplies at setup (DESIGN §12): the Discord server ID and invite, the bot token, the Resend key, the GitHub token, and the GoDaddy DNS records.
+
+Leaderboards (live 2026-09-27):
+- **Whenever a game's default settings change, start a new season** with the new ranked settings (LAUNCH_CHECKLIST Part H, "New season"), or its runs are refused as not ranked.
+- Not built yet (DESIGN §13): the `/admin` Leaderboards tab, a player opt-out on `/me`, and removing disabled or deleted accounts from boards automatically.
