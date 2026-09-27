@@ -1,6 +1,6 @@
 name: Build and deploy site
 
-# Every push and PR: typecheck, test, build.
+# Every push and PR: typecheck, test, build (the site, and the leaderboard server in server/).
 # Pushes to main also deploy to GitHub Pages once Pages is switched on:
 #   1. Make the repo public (free plan) — DESIGN §12.
 #   2. Settings → Pages → Source: "GitHub Actions"; custom domain gametronyx.com.
@@ -40,6 +40,24 @@ jobs:
         with:
           path: dist
           retention-days: 1
+
+  # The leaderboard server (server/) is its own package; it deploys to the box by hand (server/deploy/).
+  server:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
 
   deploy:
     needs: build

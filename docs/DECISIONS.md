@@ -30,6 +30,13 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | U22 | Platforms (2026-09-26) | Cartridges say where each game runs: **Jerboa: mobile or desktop**; **No Easy Way Up and Red Ring: desktop only** |
 | U23 | Card link-outs (2026-09-26) | **No "Visit site" link on game cards.** Play already opens the game. Replaces U15's card link-out; the footer link to noeasywayup.com stays |
 
+## Tyler-approved (2026-09-27, leaderboards)
+
+| # | Topic | Decision |
+|---|---|---|
+| U24 | Leaderboards | Games get leaderboards of players by Gametronyx username. The **back end lives in this repo** (`server/`); **each game's front end lives in that game's repo** (Jerboa: 3-minutes-to-midnight). Nothing leaderboard-related goes in EFdungeon |
+| U25 | Jerboa end screen | When the Ring catches him, a celebration with the board and Play again replaces the game-over panel; the player's row always shows, about a third of the way down (3-minutes-to-midnight DECISIONS L1–L3) |
+
 ## Agent calls (for Tyler's review)
 
 | # | Call | Why |
@@ -79,6 +86,16 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | A43 | The server go-live is one root command on the box (`gametronyx-go-live.sh`), with the code staged by the box's own Actions runner | Tyler has no bash or rsync on his desktop. Claude stages; Tyler pulls the trigger (EFdungeon's RED lane) |
 | A44 | Removing NEWU's basic auth needs a telemetry decision first | `POST /api/telemetry` has its own basic auth and relies on browsers holding the playtest credential |
 | A45 | GT-01 details: the signed-out keys are A = Request invite, B = Log in and a level ▶ key = I have a code; signed in, A = Play, B = Schedule and ▶ = My account. Faux letters swap A, N, O, R and W only; the key letters use the headline font | Keeps faux words readable; the ▶ key keeps the invite-code path one tap away. Tyler asked for it level and labelled "I have a code", not "Start" |
+| A46 | The leaderboard server is its own package in `server/`: Node 22, TypeScript, Fastify, and SQLite through Node's built-in `node:sqlite` | Same language as the rest of this repo; no native modules to compile; one small container. Its own npm package and CI job keep it apart from the Pages build |
+| A47 | It runs on the Hetzner box beside the accounts API, on its own hostname **`scores.gametronyx.com`** (nginx + certbot) and port `127.0.0.1:8004` | GitHub Pages can't run a server. Its own hostname means nothing in EFdungeon or the `api.gametronyx.com` config changes |
+| A48 | Players are identified by asking the accounts API `GET /api/auth/me` with the game's session token, cached a minute; the server keeps only user id and username | No shared signing key and no access to the accounts database, so the server holds no secrets; disabled accounts and force-logouts are honoured |
+| A49 | Its own SQLite database with a daily copy kept 14 days (`VACUUM INTO`), not a table in the accounts Postgres | Playtest scale; separate storage keeps the two services independent. The box's nightly job only covers Postgres |
+| A50 | Boards: each player's best score per season; ties share a rank, earlier first. Replies carry the top 10 and 5 places above and 10 below the viewer | Matches the Jerboa end screen (L3: the player's row a third of the way down) |
+| A51 | A game's `ranked_settings` must match the run exactly apart from `free_settings` (Jerboa: seed); per-game sanity checks refuse impossible runs; a resent `run_id` isn't counted twice; 30 posts per player per hour | Keeps honest mistakes and nonsense off the board. The score comes from the browser, so a determined cheat is handled by admin **hide** |
+| A52 | Seasons are admin-named ("Playtest 6"). Jerboa is seeded at first start: enabled, season "Playtest 6", Playtest 6's defaults. Changing a game's defaults means starting a new season with the new ranked settings | Scores stay comparable within a season; old seasons stay readable |
+| A53 | Deploy: pull this public repo on the box and run `server/deploy/scores-go-live.sh` as root; it's also how updates ship | One root command, like the accounts go-live (A43), without a second Actions runner |
+| A54 | Until the `/admin` Leaderboards tab exists, seasons and hiding run on the box: `deploy/scores-admin.sh` (the same rules as the admin API, §15.3) | The server shipped first; the tab is the next step. Like `make_admin` for accounts |
+| A55 | Jerboa posts to `VITE_SCORES_API` (default `https://scores.gametronyx.com`), fixed at build time like the accounts address | A URL override could send the session token elsewhere (3-minutes-to-midnight G-06) |
 
 ## Open items
 None block the design. Values Tyler supplies at setup (DESIGN §12): the Discord server ID and invite, the bot token, the Resend key, the GitHub token, and the GoDaddy DNS records.

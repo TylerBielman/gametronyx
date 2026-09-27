@@ -78,6 +78,11 @@ Gametronyx.com is a static React site on GitHub Pages. It talks to one **shared 
  │                                  │            │
  │                                  ▼            │
  │                        Postgres (efdungeon)   │
+ │                                               │
+ │ nginx: scores.gametronyx.com ─► leaderboard   │
+ │   server (Node, this repo's server/)          │
+ │   ├─ SQLite scores.db (+ daily backups)       │
+ │   └─ asks the accounts API who a player is    │
  └───────────────────────────────────────────────┘
                         │ outbound from the API
                         ├─► Resend (new free account): email
@@ -87,6 +92,7 @@ Gametronyx.com is a static React site on GitHub Pages. It talks to one **shared 
  Game sites reached through the launcher:
    Jerboa ─ tylerbielman.github.io/3-minutes-to-midnight/
    NEWU   ─ noeasywayup.com (same Hetzner server)
+ Each game shows its own leaderboard from scores.gametronyx.com (§15).
 ```
 
 ### 3.1 Front end: `TylerBielman/gametronyx`
@@ -96,7 +102,7 @@ Gametronyx.com is a static React site on GitHub Pages. It talks to one **shared 
 - **Config**: `VITE_API_BASE=https://api.gametronyx.com`. This is the only build-time value, and it is not secret. In development it is empty and Vite proxies `/api` to a local API on port 8000.
 - **Fonts** *(agent)*: PT Sans Narrow, PT Mono and Press Start 2P are bundled with the site (Fontsource, latin and cyrillic subsets). The site makes no third-party requests.
 - **Deploy gate**: every push runs typecheck, tests and build. Pushes to `main` deploy to Pages only once the repo variable `PAGES_ENABLED` is `true`, so CI stays green while the repo is private.
-- **Repo visibility**: the repo stays **private while we build and is made public at launch** (Tyler's decision), right before Pages is turned on. GitHub Pages on a private repo needs a paid plan. The repo holds only front-end code and docs, so never commit secrets, server IPs or admin details. Those live in the EFdungeon repo and on the server.
+- **Repo visibility**: the repo stays **private while we build and is made public at launch** (Tyler's decision), right before Pages is turned on. GitHub Pages on a private repo needs a paid plan. The repo holds the front end, the leaderboard server (§15) and docs, so never commit secrets, server IPs or admin details. Those live in the EFdungeon repo and on the server. The leaderboard server needs no secrets.
 
 ### 3.2 Back end: shared player-accounts API
 - **Code** *(agent)*: stays in `TylerBielman/EFdungeon/backend`, which already has the deploy scripts, Alembic chain and tests. Gametronyx endpoints are added as new routers (`app/api/routes/gtx_*.py`). If a third site ever needs accounts, extract the service into its own repo.
@@ -563,3 +569,54 @@ Steps that need Tyler's accounts or root SSH on the server:
 5. **M5 Scheduling** (*built*: API on the EFdungeon branch, pages here): slots, signups and waitlist; `/schedule` and My sessions; the timer; confirmation, reminder and Discord emails with `.ics`; Discord Scheduled Events. Creating sessions needs the admin UI (M6), or the admin API until then.
 6. **M6 Admin** (*built*): `/admin` with Activity, Players, Invite codes, Requests, Games, Sessions (with rosters) and Settings. It works at phone width. Admins reach it from `/me` (Open admin) or, on wider screens, the header.
 7. **M7 Launch**: the §12 checklist and smoke test; invite the first playtesters.
+8. **M8 Leaderboards** (*built*, not deployed): the leaderboard server in this repo's `server/` (§15) and Jerboa's end-of-run leaderboard in 3-minutes-to-midnight. Going live is checklist Part H. Next: a Leaderboards tab in `/admin`.
+
+---
+
+## 15. Leaderboards
+
+Tyler's decision (2026-09-27): the leaderboard back end lives in this repo, and each game's front end lives in that game's repo. Jerboa's end-of-run celebration and board are in 3-minutes-to-midnight (`src/finale.ts`, `src/leaderboard.ts`, `src/gtx.ts`).
+
+### 15.1 Shape
+- **Code**: `server/`, its own npm package (Node 22 + TypeScript + Fastify). Nothing from the site is shared with it at runtime; CI tests it in its own job.
+- **Where it runs**: a Docker container on the Hetzner box beside the accounts API, listening on `127.0.0.1:8004`. nginx serves it as **`scores.gametronyx.com`**, with its own certificate. It never touches `api.gametronyx.com`, the accounts code or the accounts database.
+- **Storage**: SQLite (`node:sqlite`) in `/opt/gametronyx-scores/data/scores.db`, with a daily copy in `data/backups/` kept 14 days. Forward-only migrations; rows are never deleted, only hidden.
+- **Who is playing**: the game sends the player's Gametronyx session token (from the launch handoff, §5.6). The server asks the accounts API `GET /api/auth/me` on `127.0.0.1:8001` and caches the answer for a minute. So it holds no secrets and never sees passwords or emails; disabled accounts and force-logouts are honoured within that minute.
+- **Players are shown by username only**, never email.
+
+### 15.2 Rules
+- A board is per game and **season**. Each player's best score in the season counts. Ties share a rank (1, 2, 2, 4), and the earlier score is listed first.
+- A game's settings in the leaderboard decide what ranks: `ranked_settings` must match the run's settings exactly, except the `free_settings` (Jerboa: the seed).
+- Per-game sanity checks refuse runs that can't have happened. Jerboa: score ≤ 10 × nodes, nodes ≤ hops, the Ring's time ≤ the run length, and play time within the Ring's time plus freezes.
+- A resent run (same `run_id` from the same player) is not counted twice, so games can retry safely.
+- 30 posts per player per hour, plus nginx smoothing per IP (10 a second, burst 30).
+- Jerboa is seeded at first start: enabled, season "Playtest 6", with Playtest 6's default settings.
+- **When a game's default settings change, start a new season with the new ranked settings**; until then, runs with the new settings are refused as "not ranked".
+
+### 15.3 API (all under `https://scores.gametronyx.com/api/leaderboards`)
+
+| Method and path | Auth | Purpose |
+|---|---|---|
+| `GET /health` | none | `{ok: true}` |
+| `GET /{game}?season=` | optional | The board: `{game, season, current_season, seasons[], players, rank, best, entries[], me}`. A token marks the viewer's row |
+| `POST /{game}/scores` | player | Post a finished run: `{run_id, score, settings, build?, build_sha?, nodes?, hops?, seconds?, ring_seconds?, boosts?, freezes?, near_misses?}`. `201` with the board plus `previous_rank`, `previous_best`, `personal_best`; `200` for a resend |
+| `GET /admin/games` | admin | Every game's settings, with its seasons and counts |
+| `PUT /admin/games/{game}` `{enabled?, season?, ranked_settings?, free_settings?}` | admin | Add a game or change it. A new `season` starts a fresh board; old seasons stay readable |
+| `GET /admin/games/{game}/scores?season=&before_id=&limit=` | admin | Recent runs, hidden ones included |
+| `POST /admin/scores/{id}/hide` `{reason?}` · `POST /admin/scores/{id}/unhide` | admin | Take a score off the board, or put it back |
+
+- `entries` are the top 10 plus up to 5 places above and 10 below the viewer, in rank order. `me` is the viewer's own row.
+- Errors are `{detail}`, like the accounts API:
+  - `400`: bad input;
+  - `401`: no session, or it ended;
+  - `403`: disabled account, or not an admin;
+  - `404`: no leaderboard for that game;
+  - `413`: body too large;
+  - `422`: not ranked, or a run that can't have happened;
+  - `429`: too many posts, with `Retry-After`;
+  - `503`: the accounts API couldn't be reached.
+- Game clients retry on `429`, `503` and network errors.
+
+### 15.4 Deploy
+One root command on the box, which is also how updates ship: `server/deploy/scores-go-live.sh` (checklist Part H). Until the `/admin` tab exists, `deploy/scores-admin.sh` on the box starts seasons, lists scores and hides them, with the same rules as the admin API. It builds the new image while the old one serves, keeps a safety copy of the database, restarts the container, installs the nginx site and certificate, and checks everything.
+

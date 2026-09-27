@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 // Dev: VITE_API_BASE is empty (.env.development), so the site calls /api on
@@ -21,5 +21,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['tests/setup.ts'],
+    // server/ (the leaderboard server) has its own package and tests.
+    exclude: [...configDefaults.exclude, 'server/**'],
   },
 });
