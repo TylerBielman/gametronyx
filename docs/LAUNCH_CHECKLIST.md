@@ -184,7 +184,18 @@ Held by Tyler on 2026-09-26. Gametronyx works without it: NEWU still launches, i
 Needs Part C done (the accounts API running on the box). About 10 minutes, any SSH client.
 
 ### H1. DNS
-At GoDaddy (as in A2), add `A` with name `scores` and **the same IP as `api`**. Wait a few minutes for it to resolve.
+This tells the internet that `scores.gametronyx.com` lives on the same server as `api.gametronyx.com`.
+
+1. GoDaddy → **My Products** → `gametronyx.com` → **DNS** → **Add New Record**.
+2. Fill it in, then **Save**:
+
+   | Type | Name | Value |
+   |---|---|---|
+   | CNAME | `scores` | `api.gametronyx.com` |
+
+3. It usually works within a few minutes, and can take up to an hour.
+
+A CNAME points at the `api` name, so there's no server address to copy, and it follows `api` if the server ever moves.
 
 ### H2. Go live
 ```bash
