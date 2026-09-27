@@ -54,4 +54,4 @@ It goes live, and updates, with one root command on the box: [LAUNCH_CHECKLIST P
 
 `.github/workflows/pages.yml` typechecks, tests and builds every push. Pushes to `main` deploy to GitHub Pages once the repo is public and the `PAGES_ENABLED` variable is `true` (DESIGN §12).
 
-Status: M1 (accounts API) and M2 (site shell) are built; neither is deployed yet. M8 (leaderboard server) is built and not deployed.
+Status: the site and the accounts API are live. M8, the leaderboard server, went live at `scores.gametronyx.com` on 2026-09-27; its follow-ups are in DESIGN §13.

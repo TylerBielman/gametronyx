@@ -558,6 +558,11 @@ Steps that need Tyler's accounts or root SSH on the server:
 - Moving the site off GitHub Pages.
 - Extracting the accounts service into its own repo.
 - Per-session Discord invites, Discord DMs, and bulk "message everyone in this slot" from admin.
+- Leaderboard follow-ups (M8):
+  - a **Leaderboards tab in `/admin`** for seasons, ranked settings and hiding scores (today: `server/deploy/scores-admin.sh` on the box);
+  - a player opt-out ("hide me from leaderboards") on `/me`;
+  - dropping disabled or deleted accounts from boards automatically (today: hide them by hand);
+  - checking runs by replaying them (scores come from the browser; see §15.2).
 
 ---
 
@@ -569,7 +574,7 @@ Steps that need Tyler's accounts or root SSH on the server:
 5. **M5 Scheduling** (*built*: API on the EFdungeon branch, pages here): slots, signups and waitlist; `/schedule` and My sessions; the timer; confirmation, reminder and Discord emails with `.ics`; Discord Scheduled Events. Creating sessions needs the admin UI (M6), or the admin API until then.
 6. **M6 Admin** (*built*): `/admin` with Activity, Players, Invite codes, Requests, Games, Sessions (with rosters) and Settings. It works at phone width. Admins reach it from `/me` (Open admin) or, on wider screens, the header.
 7. **M7 Launch**: the §12 checklist and smoke test; invite the first playtesters.
-8. **M8 Leaderboards** (*built*, not deployed): the leaderboard server in this repo's `server/` (§15) and Jerboa's end-of-run leaderboard in 3-minutes-to-midnight. Going live is checklist Part H. Next: a Leaderboards tab in `/admin`.
+8. **M8 Leaderboards** (*live* 2026-09-27): the leaderboard server in this repo's `server/` (§15), at `scores.gametronyx.com`, and Jerboa's end-of-run leaderboard in 3-minutes-to-midnight (PRs gametronyx#1 and 3-minutes-to-midnight#5). Follow-ups are in §13.
 
 ---
 
