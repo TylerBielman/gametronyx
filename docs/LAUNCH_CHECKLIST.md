@@ -178,3 +178,39 @@ Held by Tyler on 2026-09-26. Gametronyx works without it: NEWU still launches, i
      ssh root@noeasywayup.com "sed -i -E 's/^([[:space:]]*)(auth_basic \"EFdungeon playtest\";|auth_basic_user_file \/etc\/nginx\/.htpasswd-noeasywayup;)/\1# \2/' /etc/nginx/sites-available/noeasywayup.com && nginx -t && systemctl reload nginx"
      curl -sI https://noeasywayup.com | head -1    # HTTP/2 200 (no longer 401)
      ```
+
+## Part H — leaderboard server (scores.gametronyx.com)
+
+Needs Part C done (the accounts API running on the box). About 10 minutes, any SSH client.
+
+### H1. DNS
+At GoDaddy (as in A2), add `A` with name `scores` and **the same IP as `api`**. Wait a few minutes for it to resolve.
+
+### H2. Go live
+```bash
+ssh root@noeasywayup.com
+git clone https://github.com/TylerBielman/gametronyx /opt/gametronyx-src 2>/dev/null || git -C /opt/gametronyx-src pull --ff-only
+bash /opt/gametronyx-src/server/deploy/scores-go-live.sh
+```
+- What it does: builds the leaderboard server, keeps a safety copy of the scores, starts it, sets up `https://scores.gametronyx.com` with a certificate, and checks each step.
+- It ends with **ALL DONE**. If it stops, copy everything it printed and send it to Claude.
+- It doesn't touch the accounts API, its database, NEWU or `api.gametronyx.com`.
+
+### H3. Try it
+On your phone: gametronyx.com → **Play Jerboa**, and let the Ring catch him. The end screen should say **LEADERBOARD · PLAYTEST 6** with your username highlighted.
+
+### Updates
+Run the same two commands from H2 again: they pull the latest code and restart the server with the scores kept.
+
+### New season, hiding a score
+When a Jerboa playtest changes the default settings, the board needs a new season with the new settings, or new runs are refused as "not ranked". Until the admin tab exists, do it on the box. Claude can write the exact line with the new settings for you.
+```bash
+ssh root@noeasywayup.com
+bash /opt/gametronyx-scores/deploy/scores-admin.sh season jerboa "Playtest 7" '<new settings from Claude>'
+```
+The same command handles the rest; run it with no arguments for the list:
+- `games` shows each board and its seasons;
+- `scores jerboa 30` lists recent scores with their numbers;
+- `hide 42 "test run"` takes score #42 off the board, and `unhide 42` puts it back.
+Old seasons stay readable.
+

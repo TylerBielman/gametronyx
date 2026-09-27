@@ -1,0 +1,22 @@
+# Gametronyx leaderboard server — production compose, on the Hetzner box beside the accounts API.
+# deploy/scores-go-live.sh copies server/ to /opt/gametronyx-scores and runs this there.
+#
+# Host networking: it listens on 127.0.0.1:8004 for nginx (scores.gametronyx.com) and reaches the accounts API
+# on 127.0.0.1:8001 to recognise players. No secrets: it never sees a password or signing key.
+name: gametronyx-scores
+
+services:
+  scores:
+    build: .
+    network_mode: host
+    environment:
+      - HOST=127.0.0.1
+      - PORT=8004
+      - DATA_DIR=/data
+      - ACCOUNTS_API=http://127.0.0.1:8001
+      # Browsers allowed to call it: the site and the game builds.
+      - CORS_ORIGINS=https://gametronyx.com,https://www.gametronyx.com,https://tylerbielman.github.io,https://noeasywayup.com,https://www.noeasywayup.com
+    volumes:
+      # scores.db and backups/ (one a day, kept 14 days). Owned by uid 1000 (the image's `node` user).
+      - ./data:/data
+    restart: unless-stopped
