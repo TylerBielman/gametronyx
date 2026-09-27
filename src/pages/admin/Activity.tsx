@@ -25,6 +25,46 @@ const LABELS: Record<string, string> = {
   email_failed: 'email failed',
 };
 
+const EMAILS: Record<string, string> = {
+  welcome: 'welcome email',
+  verify_email: 'email confirmation',
+  password_reset: 'password reset',
+  admin_invite_request: 'invite-request alert to admins',
+  invite_approved: 'invite approval',
+  playtest_confirmed: 'session confirmation',
+  playtest_waitlisted: 'waitlist notice',
+  playtest_promoted: 'waitlist promotion',
+  playtest_reminder: '4-hour reminder',
+  playtest_join: '15-minute Discord email',
+  playtest_updated: 'session change notice',
+  playtest_cancelled: 'session cancelled notice',
+  admin_playtest_signup: 'sign-up alert to admins',
+};
+
+// Plain-English reading of the usual Resend refusals.
+function emailHint(error: string): string | null {
+  const e = error.toLowerCase();
+  if (e.includes('not verified') || e.includes('testing emails')) return 'Resend says the gametronyx.com domain isn’t verified yet.';
+  if (e.includes('resend 401') || e.includes('api key')) return 'Resend rejected the API key on the server.';
+  if (e.includes('resend 422')) return 'Resend rejected the message, usually because the address isn’t valid.';
+  if (e.includes('resend 429')) return 'Resend’s sending limit was hit.';
+  if (e.includes('timed out') || e.includes('connect')) return 'The server couldn’t reach Resend.';
+  return null;
+}
+
+function EmailFailure({ details }: { details: Record<string, unknown> | null }) {
+  const template = typeof details?.template === 'string' ? details.template : '';
+  const error = typeof details?.error === 'string' ? details.error : '';
+  const hint = emailHint(error);
+  return (
+    <div className="basis-full text-fg-2">
+      {template && <p>Which email: {EMAILS[template] ?? template.replace(/_/g, ' ')}</p>}
+      {hint && <p className="font-bold text-red-text">{hint}</p>}
+      {error && <p className="break-words font-mono text-xs text-fg-3">{error}</p>}
+    </div>
+  );
+}
+
 function line(e: ActivityEvent): string {
   const what = LABELS[e.type] ?? e.type.replace(/_/g, ' ');
   const who = e.actor ?? e.subject ?? '';
@@ -85,6 +125,7 @@ export default function Activity() {
               <time className="font-mono text-xs text-fg-3" dateTime={e.at ?? undefined}>
                 {shortDate(e.at)}
               </time>
+              {e.type === 'email_failed' && <EmailFailure details={e.details} />}
             </li>
           ))}
         </ol>

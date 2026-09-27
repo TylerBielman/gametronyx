@@ -4,6 +4,7 @@ import type { ReactElement } from 'react';
 import { Route } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import RequireAdmin from '../src/components/RequireAdmin';
+import Activity from '../src/pages/admin/Activity';
 import AdminLayout from '../src/pages/admin/AdminLayout';
 import Codes from '../src/pages/admin/Codes';
 import Requests from '../src/pages/admin/Requests';
@@ -36,6 +37,22 @@ describe('admin', () => {
     mockApi([{ path: '/auth/me', body: PLAYER }]);
     renderAt('/admin/requests', wrap('requests', <Requests />));
     expect(await screen.findByRole('heading', { name: 'Admins only' })).toBeInTheDocument();
+  });
+
+  it('explains a failed email in the activity feed', async () => {
+    const failed = {
+      id: 9, at: null, type: 'email_failed', actor: null, subject: null, game: null,
+      details: { outbox_id: 4, template: 'invite_approved', error: 'Resend 403: {"message":"The gametronyx.com domain is not verified."}' },
+    };
+    mockApi([
+      { path: '/auth/me', body: ADMIN },
+      { path: '/admin/activity/types', body: ['email_failed'] },
+      { path: '/admin/activity', body: [failed] },
+    ]);
+    renderAt('/admin/activity', wrap('activity', <Activity />));
+    expect(await screen.findByText('Which email: invite approval')).toBeInTheDocument();
+    expect(screen.getByText(/domain isn’t verified yet/)).toBeInTheDocument();
+    expect(screen.getByText(/Resend 403/)).toBeInTheDocument();
   });
 
   it('approves an invite request', async () => {
