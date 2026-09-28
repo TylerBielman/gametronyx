@@ -1,0 +1,21 @@
+{
+  "_about": "Each game's current leaderboard season. Every deploy applies this file (server/src/cli.ts apply), so merging a change here starts a season or changes ranked settings. A new season name starts a fresh board; old seasons stay readable. When a game's default settings change, give it a new season with the new ranked settings in the same change. Fields left out keep their current values. See docs/DECISIONS.md A57.",
+  "jerboa": {
+    "season": "Playtest 7",
+    "ranked_settings": {
+      "duration": 180,
+      "grid": 19,
+      "hopMs": 450,
+      "nodeCount": 10,
+      "spawn": "random",
+      "roadLimit": 25,
+      "hitRadius": 0.1,
+      "boostSpeed": 1.4,
+      "boostMs": 7000,
+      "freezeMs": 6000,
+      "slots": 2
+    },
+    "free_settings": ["seed"],
+    "enabled": true
+  }
+}

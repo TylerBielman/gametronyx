@@ -559,7 +559,7 @@ Steps that need Tyler's accounts or root SSH on the server:
 - Extracting the accounts service into its own repo.
 - Per-session Discord invites, Discord DMs, and bulk "message everyone in this slot" from admin.
 - Leaderboard follow-ups (M8):
-  - a **Leaderboards tab in `/admin`** for seasons, ranked settings and hiding scores (today: `server/deploy/scores-admin.sh` on the box);
+  - a **Leaderboards tab in `/admin`** for hiding scores (today: `server/deploy/scores-admin.sh` on the box; seasons and ranked settings are `server/seasons.json`, A57);
   - a player opt-out ("hide me from leaderboards") on `/me`;
   - dropping disabled or deleted accounts from boards automatically (today: hide them by hand);
   - checking runs by replaying them (scores come from the browser; see §15.2).
@@ -596,7 +596,7 @@ Tyler's decision (2026-09-27): the leaderboard back end lives in this repo, and 
 - A resent run (same `run_id` from the same player) is not counted twice, so games can retry safely.
 - 30 posts per player per hour, plus nginx smoothing per IP (10 a second, burst 30).
 - Jerboa is seeded at first start: enabled, season "Playtest 6", with Playtest 6's default settings.
-- **When a game's default settings change, start a new season with the new ranked settings**; until then, runs with the new settings are refused as "not ranked".
+- **When a game's default settings change, start a new season with the new ranked settings** by editing `server/seasons.json` in the same change (every deploy applies it); until then, runs with the new settings are refused as "not ranked".
 
 ### 15.3 API (all under `https://scores.gametronyx.com/api/leaderboards`)
 
@@ -623,5 +623,5 @@ Tyler's decision (2026-09-27): the leaderboard back end lives in this repo, and 
 - Game clients retry on `429`, `503` and network errors.
 
 ### 15.4 Deploy
-One root command on the box, which is also how updates ship: `server/deploy/scores-go-live.sh` (checklist Part H). Until the `/admin` tab exists, `deploy/scores-admin.sh` on the box starts seasons, lists scores and hides them, with the same rules as the admin API. It builds the new image while the old one serves, keeps a safety copy of the database, restarts the container, installs the nginx site and certificate, and checks everything.
+**Merging a change to `server/` into main deploys it** (DECISIONS U26, A56): `.github/workflows/deploy-scores.yml` runs the server's typecheck and tests, then connects to the box with a deploy key that can only run the deploy: fast-forward `/opt/gametronyx-src` to main, run `server/deploy/scores-go-live.sh`, and apply `server/seasons.json` (A57). The log is in Actions. The same go-live can still be run by hand as root (checklist Part H, "Updates"). `deploy/scores-admin.sh` on the box lists and hides scores. It builds the new image while the old one serves, keeps a safety copy of the database, restarts the container, installs the nginx site and certificate, and checks everything.
 

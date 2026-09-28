@@ -1,0 +1,53 @@
+name: Deploy leaderboard server
+
+# Merges to main that touch server/ ship the leaderboard server (scores.gametronyx.com) and apply
+# server/seasons.json. The deploy key in the SCORES_DEPLOY secret (made on the box by server/deploy/setup-ci-deploy.sh,
+# with the box's host key on its last line) can only run the deploy there: move to main, go live, apply the seasons.
+# Run it by hand from the Actions tab too. docs/LAUNCH_CHECKLIST.md Part H; DECISIONS U26, A56, A57.
+
+on:
+  push:
+    branches: [main]
+    paths: ['server/**', '.github/workflows/deploy-scores.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-scores
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Test the server
+        working-directory: server
+        run: npm ci && npm run typecheck && npm test
+      - name: Deploy to the box
+        env:
+          SCORES_DEPLOY: ${{ secrets.SCORES_DEPLOY }}
+          HOST: ${{ vars.SCORES_DEPLOY_HOST || 'noeasywayup.com' }}
+        run: |
+          if [ -z "$SCORES_DEPLOY" ]; then
+            echo "::warning::Not deployed: the SCORES_DEPLOY secret isn't set yet (docs/LAUNCH_CHECKLIST.md Part H, Automatic deploys)."
+            exit 0
+          fi
+          install -d -m 700 ~/.ssh
+          # A paste from a terminal can carry Windows line endings and trailing spaces.
+          printf '%s\n' "$SCORES_DEPLOY" | tr -d '\r' | sed 's/[[:space:]]*$//' > ~/.ssh/deploy.all
+          sed -n '/^-----BEGIN OPENSSH PRIVATE KEY-----$/,/^-----END OPENSSH PRIVATE KEY-----$/p' ~/.ssh/deploy.all > ~/.ssh/deploy
+          sed '/^-----BEGIN OPENSSH PRIVATE KEY-----$/,/^-----END OPENSSH PRIVATE KEY-----$/d; /^$/d; /^-----/d' ~/.ssh/deploy.all > ~/.ssh/known_hosts
+          rm ~/.ssh/deploy.all
+          chmod 600 ~/.ssh/deploy ~/.ssh/known_hosts
+          ssh-keygen -y -f ~/.ssh/deploy > /dev/null || { echo "::error::SCORES_DEPLOY doesn't hold a readable deploy key; run setup-ci-deploy.sh again and re-paste it."; exit 1; }
+          [ -s ~/.ssh/known_hosts ] || { echo "::error::SCORES_DEPLOY is missing the box's host key line (the last line setup-ci-deploy.sh prints)."; exit 1; }
+          ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            -o ServerAliveInterval=30 -o ConnectTimeout=20 "root@$HOST" deploy
