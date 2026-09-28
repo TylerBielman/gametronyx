@@ -233,7 +233,7 @@ After this, merging a change to `server/` deploys it from GitHub, and seasons ch
    git -C /opt/gametronyx-src checkout main && git -C /opt/gametronyx-src pull --ff-only && bash /opt/gametronyx-src/server/deploy/setup-ci-deploy.sh
    ```
 3. Copy everything between `----- copy from the next line -----` and `----- to the line above -----`. It starts with `-----BEGIN OPENSSH PRIVATE KEY-----` and ends with a line starting `noeasywayup.com ssh-ed25519`.
-4. On GitHub: **TylerBielman/gametronyx** → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**. Name: `SCORES_DEPLOY`. Secret: paste the block. **Add secret**.
+4. On GitHub: **TylerBielman/gametronyx** → **Settings** → **Secrets and variables** → **Actions** → the **Secrets** tab (not Variables) → **New repository secret**. Name: `SCORES_DEPLOY`. Secret: paste the block. **Add secret**. It then shows under "Repository secrets".
 5. Type `exit` to leave the server, and tell Claude it's set. Claude runs the first deploy from the **Actions** tab.
 
 Running the setup again makes a new key and retires the old one (paste the new block over the secret). The setup adds only that key and the one command it may run (`/usr/local/sbin/gametronyx-scores-deploy`); your own SSH login is untouched.
