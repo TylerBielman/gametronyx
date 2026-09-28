@@ -13,10 +13,11 @@ Tyler lets the agent make routine calls, provided they are recorded in the decis
 
 ## Guardrails
 - Free tiers only. Gametronyx email uses its **own** Resend account. Never reuse underdog-football's.
-- No secrets in this repo. `VITE_API_BASE` is the only build-time value. The leaderboard server needs none: it identifies players by asking the accounts API `GET /api/auth/me`, and never reads the accounts database.
+- No secrets in this repo. The leaderboard deploy key lives only in the `SCORES_DEPLOY` Actions secret (A56). `VITE_API_BASE` is the only build-time value. The leaderboard server needs none: it identifies players by asking the accounts API `GET /api/auth/me`, and never reads the accounts database.
 - Feedback issues go to public repos: include the username, **never** the email. Leaderboards show usernames only, too.
 - Existing `users` and `invite_codes` rows must never be wiped. Schema changes are forward-only Alembic migrations.
-- Agents cannot root-SSH to the server. Server steps go in the setup checklist (DESIGN §12) for Tyler to run.
+- Agents cannot root-SSH to the server. The **leaderboard server deploys itself** from GitHub when a change to `server/` merges to main (`.github/workflows/deploy-scores.yml`, DECISIONS U26/A56); check that run and fix it if it fails. Seasons change by editing `server/seasons.json` (A57). Other server steps go in the setup checklist (DESIGN §12) for Tyler to run.
+- Tyler authorized Claude to **merge its own PRs once CI is green** (U26, 2026-09-28) and say what shipped, unless he asks to review first.
 - Match NEWU's look (DESIGN §4.4). The site is mobile-first.
 - Test meaningful auth, handoff, timing (reminders, feedback cadence) and input changes. Before handing off UI work, drive it in a real browser against a local API (README) at phone width, 360–390 px.
 - Colors come from CSS variables, so Tailwind's `/opacity` modifiers (`text-bone/20`) silently do nothing. Use `rgba()` instead.

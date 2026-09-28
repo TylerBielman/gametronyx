@@ -221,8 +221,25 @@ A CNAME points at the `api` name, so there's no server address to copy, and it f
 ### H3. Try it
 On your phone: gametronyx.com → **Play Jerboa**, and let the Ring catch him. The end screen should say **LEADERBOARD · PLAYTEST 6** with your username highlighted.
 
+### Automatic deploys (one time, about 5 minutes) — then no more SSH for leaderboard changes
+After this, merging a change to `server/` deploys it from GitHub, and seasons change by editing `server/seasons.json` (DECISIONS U26, A56, A57). Claude opens, checks and merges those changes and watches the deploy.
+
+1. In PowerShell (any folder), log in to the server:
+   ```bash
+   ssh root@noeasywayup.com
+   ```
+2. Run this one line on the server. It makes a deploy key that can only run the deploy, and prints a block of text:
+   ```bash
+   git -C /opt/gametronyx-src checkout main && git -C /opt/gametronyx-src pull --ff-only && bash /opt/gametronyx-src/server/deploy/setup-ci-deploy.sh
+   ```
+3. Copy everything between `----- copy from the next line -----` and `----- to the line above -----`. It starts with `-----BEGIN OPENSSH PRIVATE KEY-----` and ends with a line starting `noeasywayup.com ssh-ed25519`.
+4. On GitHub: **TylerBielman/gametronyx** → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**. Name: `SCORES_DEPLOY`. Secret: paste the block. **Add secret**.
+5. Type `exit` to leave the server, and tell Claude it's set. Claude runs the first deploy from the **Actions** tab.
+
+Running the setup again makes a new key and retires the old one (paste the new block over the secret). The setup adds only that key and the one command it may run (`/usr/local/sbin/gametronyx-scores-deploy`); your own SSH login is untouched.
+
 ### Updates
-Log in as in H2 step 1, then one at a time:
+Automatic once the step above is done: merging to main runs **Deploy leaderboard server** in the Actions tab. To run it by hand anyway, as before:
 ```bash
 cd /opt/gametronyx-src
 ```
@@ -238,14 +255,14 @@ bash server/deploy/scores-go-live.sh
 The scores are kept.
 
 ### New season, hiding a score
-When a Jerboa playtest changes the default settings, the board needs a new season with the new settings, or new runs are refused as "not ranked". Until the admin tab exists, do it on the box. Claude can write the exact line with the new settings for you.
+Seasons live in `server/seasons.json`: the current season for each game, with its ranked settings. **Every deploy applies it**, so a new season (for example when Jerboa's default settings change) is a one-line change that Claude makes and merges; there's nothing to run on the box. Old seasons stay readable.
+
+For one-offs, `scores-admin.sh` still works on the box (run it with no arguments for the list):
 ```bash
 ssh root@noeasywayup.com
-bash /opt/gametronyx-scores/deploy/scores-admin.sh season jerboa "Playtest 7" '<new settings from Claude>'
+bash /opt/gametronyx-scores/deploy/scores-admin.sh scores jerboa 30
 ```
-The same command handles the rest; run it with no arguments for the list:
 - `games` shows each board and its seasons;
 - `scores jerboa 30` lists recent scores with their numbers;
 - `hide 42 "test run"` takes score #42 off the board, and `unhide 42` puts it back.
-Old seasons stay readable.
-
+A season started this way is undone by the next deploy unless `server/seasons.json` says the same, so change seasons through the file.

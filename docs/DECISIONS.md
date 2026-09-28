@@ -37,6 +37,12 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | U24 | Leaderboards | Games get leaderboards of players by Gametronyx username. The **back end lives in this repo** (`server/`); **each game's front end lives in that game's repo** (Jerboa: 3-minutes-to-midnight). Nothing leaderboard-related goes in EFdungeon |
 | U25 | Jerboa end screen | When the Ring catches him, a celebration with the board and Play again replaces the game-over panel; the player's row always shows, about a third of the way down (3-minutes-to-midnight DECISIONS L1–L3) |
 
+## Tyler-approved (2026-09-28, deploys)
+
+| # | Topic | Decision |
+|---|---|---|
+| U26 | Hands-off deploys | Tyler no longer deploys by hand. **GitHub deploys the leaderboard server** when a change to `server/` merges to main, and **Claude merges its own PRs once CI is green**, saying what shipped. Tyler can still ask to review anything first. His one remaining step was the one-time key setup (A56) |
+
 ## Agent calls (for Tyler's review)
 
 | # | Call | Why |
@@ -95,11 +101,13 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | A52 | Seasons are admin-named ("Playtest 6"). Jerboa is seeded at first start: enabled, season "Playtest 6", Playtest 6's defaults. Changing a game's defaults means starting a new season with the new ranked settings | Scores stay comparable within a season; old seasons stay readable |
 | A53 | Deploy: pull this public repo on the box and run `server/deploy/scores-go-live.sh` as root; it's also how updates ship | One root command, like the accounts go-live (A43), without a second Actions runner |
 | A54 | Until the `/admin` Leaderboards tab exists, seasons and hiding run on the box: `deploy/scores-admin.sh` (the same rules as the admin API, §15.3) | The server shipped first; the tab is the next step. Like `make_admin` for accounts |
+| A56 | U26's deploy: `.github/workflows/deploy-scores.yml` tests the server, then SSHes to the box with the `SCORES_DEPLOY` secret: a deploy key whose `authorized_keys` line is `restrict,command="/usr/local/sbin/gametronyx-scores-deploy"`, so it can only run the deploy (fast-forward `/opt/gametronyx-src` to main, `scores-go-live.sh`, apply seasons), with no shell, forwarding or tty. The secret's last line pins the box's host key. `server/deploy/setup-ci-deploy.sh` makes the key once and keeps no private key on the box | Agents still never SSH to the box, and deploys don't depend on anyone's computer. The log is in Actions, so Claude can read and fix failures. The key can do nothing a merge to main couldn't already |
+| A57 | Seasons are code: `server/seasons.json` holds each game's current season, ranked settings, free settings and on/off, and every deploy applies it (`cli.ts apply`: unchanged games are left alone, a new season name starts a fresh board). `scores-admin.sh` stays for hiding scores and one-offs | A new season ships with the change that needs it, reviewed like code, with no SSH |
 | A55 | Jerboa posts to `VITE_SCORES_API` (default `https://scores.gametronyx.com`), fixed at build time like the accounts address | A URL override could send the session token elsewhere (3-minutes-to-midnight G-06) |
 
 ## Open items
 None block the design. Values Tyler supplies at setup (DESIGN §12): the Discord server ID and invite, the bot token, the Resend key, the GitHub token, and the GoDaddy DNS records.
 
 Leaderboards (live 2026-09-27):
-- **Whenever a game's default settings change, start a new season** with the new ranked settings (LAUNCH_CHECKLIST Part H, "New season"), or its runs are refused as not ranked.
+- **Whenever a game's default settings change, start a new season** with the new ranked settings: edit `server/seasons.json` in the same change (A57), or its runs are refused as not ranked.
 - Not built yet (DESIGN §13): the `/admin` Leaderboards tab, a player opt-out on `/me`, and removing disabled or deleted accounts from boards automatically.
