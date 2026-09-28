@@ -181,7 +181,7 @@ describe('what the server refuses', () => {
 
   it('refuses Jerboa runs that can’t have happened', async () => {
     const cases: Record<string, unknown>[] = [
-      { score: 101, nodes: 10 }, // a node is worth at most 10
+      { score: 201, nodes: 10 }, // a node is worth at most 20 (a 10 doubled by x2)
       { nodes: 30, hops: 20 },
       { ring_seconds: 200, seconds: 200 }, // the Ring closes at 180 s
       { seconds: 100, ring_seconds: 150 }, // play time can't be shorter than the Ring's
@@ -193,6 +193,8 @@ describe('what the server refuses', () => {
       expect(res.statusCode, JSON.stringify(change)).toBe(422);
     }
     expect((await post('ada', jerboaRun(30, { seconds: 192, ring_seconds: 180, freezes: 2 }))).statusCode).toBe(201);
+    // A short run carried by a doubled 10 is possible since Jerboa Playtest 7.
+    expect((await post('ada', jerboaRun(25, { nodes: 2 }))).statusCode).toBe(201);
   });
 
   it('slows down a flood of posts from one player', async () => {

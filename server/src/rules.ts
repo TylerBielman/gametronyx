@@ -61,14 +61,14 @@ type Check = (run: Run) => string | null;
 
 /** Per-game sanity checks. A game without one only gets the generic shape check. */
 const CHECKS: Record<string, Check> = {
-  // Jerboa (3-minutes-to-midnight): a node is worth at most 5, doubled by x2; each node is collected on a hop; the
+  // Jerboa (3-minutes-to-midnight): a node is worth at most 10 (Playtest 7's moving 10), doubled by x2; each node is collected on a hop; the
   // Ring's clock stops while frozen, so play time is the Ring's time plus at most the freezes.
   jerboa: ({ score, stats, settings }) => {
     const { nodes, hops, seconds, ring_seconds, freezes = 0 } = stats;
     if (nodes === undefined || hops === undefined || seconds === undefined || ring_seconds === undefined)
       return 'Jerboa runs need nodes, hops, seconds and ring_seconds.';
     if (!Number.isInteger(nodes) || !Number.isInteger(hops)) return 'nodes and hops must be whole numbers.';
-    if (score > nodes * 10) return 'The score is more than the nodes collected could give.';
+    if (score > nodes * 20) return 'The score is more than the nodes collected could give.';
     if (nodes > hops) return 'More nodes than hops.';
     const duration = typeof settings.duration === 'number' ? settings.duration : 180;
     const freezeSeconds = typeof settings.freezeMs === 'number' ? settings.freezeMs / 1000 : 6;
