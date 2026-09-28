@@ -34,11 +34,17 @@ jobs:
       - name: Deploy to the box
         env:
           SCORES_DEPLOY: ${{ secrets.SCORES_DEPLOY }}
+          # Only whether a *variable* of that name exists, never its value: a key pasted there isn't secret.
+          SAVED_AS_VARIABLE: ${{ vars.SCORES_DEPLOY != '' }}
           HOST: ${{ vars.SCORES_DEPLOY_HOST || 'noeasywayup.com' }}
         run: |
           if [ -z "$SCORES_DEPLOY" ]; then
-            echo "::warning::Not deployed: the SCORES_DEPLOY secret isn't set yet (docs/LAUNCH_CHECKLIST.md Part H, Automatic deploys)."
-            exit 0
+            if [ "$SAVED_AS_VARIABLE" = true ]; then
+              echo "::error::Not deployed: SCORES_DEPLOY was saved as a Variable, not a Secret, so the key isn't private. Delete that variable (Settings → Secrets and variables → Actions → Variables), run setup-ci-deploy.sh again for a fresh key, and add the new block on the Secrets tab → New repository secret."
+            else
+              echo "::error::Not deployed: this workflow can't see a SCORES_DEPLOY secret. Add it in TylerBielman/gametronyx → Settings → Secrets and variables → Actions → Secrets tab → New repository secret (not an environment, Codespaces or Dependabot secret). docs/LAUNCH_CHECKLIST.md Part H."
+            fi
+            exit 1
           fi
           install -d -m 700 ~/.ssh
           # A paste from a terminal can carry Windows line endings and trailing spaces.
