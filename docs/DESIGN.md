@@ -592,7 +592,7 @@ Tyler's decision (2026-09-27): the leaderboard back end lives in this repo, and 
 ### 15.2 Rules
 - A board is per game and **season**. Each player's best score in the season counts. Ties share a rank (1, 2, 2, 4), and the earlier score is listed first.
 - A game's settings in the leaderboard decide what ranks: `ranked_settings` must match the run's settings exactly, except the `free_settings` (Jerboa: the seed).
-- Per-game sanity checks refuse runs that can't have happened. Jerboa: score ≤ 10 × nodes, nodes ≤ hops, the Ring's time ≤ the run length, and play time within the Ring's time plus freezes.
+- Per-game sanity checks refuse runs that can't have happened. Jerboa: score ≤ 20 × nodes (a moving 10 doubled by x2), nodes ≤ hops, the Ring's time ≤ the run length, and play time within the Ring's time plus freezes.
 - A resent run (same `run_id` from the same player) is not counted twice, so games can retry safely.
 - 30 posts per player per hour, plus nginx smoothing per IP (10 a second, burst 30).
 - Jerboa is seeded at first start: enabled, season "Playtest 6", with Playtest 6's default settings.
