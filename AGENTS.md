@@ -8,7 +8,7 @@ Tyler lets the agent make routine calls, provided they are recorded in the decis
 Ask Tyler in the moment, in the conversation, with a short multiple-choice question and a recommended answer. Never leave an open question in a doc, a PR description or a GitHub issue: pick the default, write it down as the decision, and ask him there and then if it's his call.
 
 ## Session start
-Tyler starts sessions with `/session-start` (`.claude/skills/session-start/SKILL.md`): it covers getting oriented and how he likes to work.
+Tyler starts sessions with `/session-start` (`.claude/skills/session-start/SKILL.md`), which covers getting oriented and how he likes to work, and wraps up with `/session-end` (`.claude/skills/session-end/SKILL.md`).
 
 ## Roadmap
 GitHub milestones and issues are the roadmap from M9 on. Milestones are code: edit `.github/milestones.json` and merge (A61). Each issue says what's done and how, with no open questions.
