@@ -43,6 +43,13 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 |---|---|---|
 | U26 | Hands-off deploys | Tyler no longer deploys by hand. **GitHub deploys the leaderboard server** when a change to `server/` merges to main, and **Claude merges its own PRs once CI is green**, saying what shipped. Tyler can still ask to review anything first. His one remaining step was the one-time key setup (A56) |
 
+## Tyler-approved (2026-10-08, game submissions)
+
+| # | Topic | Decision |
+|---|---|---|
+| U27 | Who adds external games | **Tyler only, in admin.** Friends send him their game's URL; he pastes it in (DESIGN §16) |
+| U28 | Card descriptions | **Free.** The site drafts the pitch from the game page's own text; Tyler edits and approves it. No paid AI model |
+
 ## Agent calls (for Tyler's review)
 
 | # | Call | Why |
