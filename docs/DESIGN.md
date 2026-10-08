@@ -637,23 +637,22 @@ Tyler's decision (2026-09-27): the leaderboard back end lives in this repo, and 
 
 ## 16. Game submissions (M9)
 
-Tyler's goal (2026-10-08): friends who host their games on their own URLs tell Gametronyx where the game is, and the site does the rest: a screenshot, a short description, and a cartridge whose Play button takes a Gametronyx player to the friend's site.
+Tyler's goal (2026-10-08): friends who host their games on their own URLs tell Tyler where the game is, and the site does the rest: a screenshot, a short description, and a cartridge whose Play button takes a Gametronyx player to the friend's site.
 
-### 16.1 Shape *(agent)*
-- **Where it runs**: the Node server in `server/` (today the leaderboard, §15), so it deploys itself on merge (U26) and nothing changes in EFdungeon. Submissions and approved external games live in its SQLite database, beside the scores.
-- **Who is submitting**: the server asks the accounts API `GET /api/auth/me` with the member's session token, exactly as the leaderboard does (A48). Admin actions need `role = admin`.
-- **The card list**: the site merges the accounts API's `/games` with the server's approved external games. External games have no handoff: their Play button opens the game's own URL in a new tab.
+### 16.1 Shape
+- **Who adds games**: **Tyler only**, in admin (U27). Friends send him the URL however they like. *(Members submitting their own games can come later with creator tools, M11.)*
+- **Where it runs** *(agent, A58)*: the Node server in `server/` (today the leaderboard, §15), so it deploys itself on merge (U26) and nothing changes in EFdungeon. Drafts and external games live in its SQLite database, beside the scores. Admin calls are checked by asking the accounts API `GET /api/auth/me` (A48) and need `role = admin`.
+- **The card list**: the site merges the accounts API's `/games` with the server's published external games. External games have no handoff: their Play button opens the game's own URL in a new tab.
+- **Cost**: free (U4, U28). No AI model is called.
 
 ### 16.2 Flow
-1. A logged-in member opens `/submit`, pastes the game's URL and, optionally, its name and a note for Tyler.
-2. The server checks the URL (https only; public hosts only, never private or loopback addresses) and queues it.
+1. In admin → **Add game by URL**, Tyler pastes the game's URL and, optionally, the creator's name.
+2. The server checks the URL (https only; public hosts only, never private or loopback addresses) and fetches the page.
 3. A headless Chromium in the server's container loads the page at desktop and phone width, waits for it to settle, and saves a screenshot as the card art. Whether the page fits a phone suggests the platform tag (U22).
-4. A short description (one-line pitch, ≤ 140 characters) is written from the page's text and screenshot.
-5. The submission waits in admin → **Submissions**. Tyler can edit the name, pitch, platform and art, re-take the screenshot, then **Approve** or **Decline**.
-6. Approved games appear as cartridges on the showcase and `/play`, credited "by <username>", with a Play button to the game's URL. Like the other games, the card is public and Play sits behind login (U7).
-7. The member sees each submission's status on `/me`.
+4. The server **drafts** the name and a one-line pitch (≤ 140 characters) from the page's own text: its title, its description and social-preview tags, and the first readable lines of the page (U28).
+5. Tyler sees the draft card, edits the name, pitch, platform and art, can re-take the screenshot, then **Publish** (or **Discard**).
+6. Published games appear as cartridges on the showcase and `/play`, credited "by <creator>" when a name was given, with a Play button to the game's URL. Like the other games, the card is public and Play sits behind login (U7).
 
 ### 16.3 Limits *(agent)*
-- 5 submissions per member per day; one pending submission per URL.
 - Screenshots: 30 s page timeout, downloads blocked, images stored on the box and served by the server's own nginx site.
-
+- If the page has no usable text, the pitch starts empty for Tyler to write.
