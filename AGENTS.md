@@ -5,6 +5,11 @@ Read `docs/DESIGN.md` and `docs/DECISIONS.md` before any change. Tyler's origina
 
 Tyler lets the agent make routine calls, provided they are recorded in the decision ledger, apart from his own decisions. Ask only about choices that materially change the site. Anything that is really a tuning value should be an admin setting, not a question.
 
+Ask Tyler in the moment, in the conversation, with a short multiple-choice question and a recommended answer. Never leave an open question in a doc, a PR description or a GitHub issue: pick the default, write it down as the decision, and ask him there and then if it's his call.
+
+## Roadmap
+GitHub milestones and issues are the roadmap from M9 on. Milestones are code: edit `.github/milestones.json` and merge (A61). Each issue says what's done and how, with no open questions.
+
 ## Shape of the system
 - This repo is the **static front end** (React + Vite + TypeScript + Tailwind on GitHub Pages at gametronyx.com). Commands: `npm ci`, `npm test`, `npm run typecheck`, `npm run build` (see README).
 - It also holds the **leaderboard server** in `server/` (Node + Fastify + SQLite, on the Hetzner box as `scores.gametronyx.com`; DESIGN §15). It is its own package: `cd server && npm ci && npm test`. Leaderboard back-end work goes there, and each game's leaderboard front end goes in that game's repo (U24). Nothing leaderboard-related goes in EFdungeon.
