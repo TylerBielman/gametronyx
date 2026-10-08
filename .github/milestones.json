@@ -1,0 +1,26 @@
+[
+  {
+    "title": "M9 Game submissions",
+    "description": "Friends who host games elsewhere give Gametronyx a URL; the server takes a screenshot, writes a short description, and Tyler approves a cartridge whose Play button links out to the game. DESIGN §16."
+  },
+  {
+    "title": "M10 Leaderboard follow-ups",
+    "description": "The leaderboard pieces deferred in DESIGN §13: the /admin Leaderboards tab, a player opt-out, and dropping disabled accounts from boards."
+  },
+  {
+    "title": "M11 Creator tools",
+    "description": "Creators own their cartridges: they edit them, see play counts, and read feedback players leave on their games. Their games can use Gametronyx login and leaderboards."
+  },
+  {
+    "title": "M12 Discord per game",
+    "description": "Discord goes live for scheduled sessions, each game can carry its own Discord link, and creators' multiplayer games can run scheduled sessions."
+  },
+  {
+    "title": "M13 Community",
+    "description": "Gametronyx becomes a place to find games: community guidelines for an AI-neutral-to-positive crowd, browsing by platform and player count, and member profiles."
+  },
+  {
+    "title": "Later",
+    "description": "Deferred items kept for reference (DESIGN §13 and LAUNCH_CHECKLIST Part G). Not scheduled."
+  }
+]

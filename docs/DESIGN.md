@@ -576,6 +576,14 @@ Steps that need Tyler's accounts or root SSH on the server:
 7. **M7 Launch**: the §12 checklist and smoke test; invite the first playtesters.
 8. **M8 Leaderboards** (*live* 2026-09-27): the leaderboard server in this repo's `server/` (§15), at `scores.gametronyx.com`, and Jerboa's end-of-run leaderboard in 3-minutes-to-midnight (PRs gametronyx#1 and 3-minutes-to-midnight#5). Follow-ups are in §13.
 
+From M9 on, milestones and their issues live on GitHub (Milestones tab). They are code: `.github/milestones.json` holds each milestone's title and description, and merging a change to it syncs GitHub (`.github/workflows/milestones.yml`).
+
+9. **M9 Game submissions** (§16): a friend gives a game's URL; the server screenshots it, writes a short description, and Tyler approves a cartridge with a Play button that links out.
+10. **M10 Leaderboard follow-ups**: the §13 leaderboard items.
+11. **M11 Creator tools**: creators edit their cartridges, see play counts and read feedback; their games can use Gametronyx login and leaderboards.
+12. **M12 Discord per game**: Discord switched on for sessions (U20), a Discord link per game, scheduled sessions for creators' multiplayer games.
+13. **M13 Community**: community guidelines for an AI-neutral-to-positive crowd, browsing by platform and player count, member profiles.
+
 ---
 
 ## 15. Leaderboards
@@ -624,4 +632,28 @@ Tyler's decision (2026-09-27): the leaderboard back end lives in this repo, and 
 
 ### 15.4 Deploy
 **Merging a change to `server/` into main deploys it** (DECISIONS U26, A56): `.github/workflows/deploy-scores.yml` runs the server's typecheck and tests, then connects to the box with a deploy key that can only run the deploy: fast-forward `/opt/gametronyx-src` to main, run `server/deploy/scores-go-live.sh`, and apply `server/seasons.json` (A57). The log is in Actions. The same go-live can still be run by hand as root (checklist Part H, "Updates"). `deploy/scores-admin.sh` on the box lists and hides scores. It builds the new image while the old one serves, keeps a safety copy of the database, restarts the container, installs the nginx site and certificate, and checks everything.
+
+---
+
+## 16. Game submissions (M9)
+
+Tyler's goal (2026-10-08): friends who host their games on their own URLs tell Gametronyx where the game is, and the site does the rest: a screenshot, a short description, and a cartridge whose Play button takes a Gametronyx player to the friend's site.
+
+### 16.1 Shape *(agent)*
+- **Where it runs**: the Node server in `server/` (today the leaderboard, §15), so it deploys itself on merge (U26) and nothing changes in EFdungeon. Submissions and approved external games live in its SQLite database, beside the scores.
+- **Who is submitting**: the server asks the accounts API `GET /api/auth/me` with the member's session token, exactly as the leaderboard does (A48). Admin actions need `role = admin`.
+- **The card list**: the site merges the accounts API's `/games` with the server's approved external games. External games have no handoff: their Play button opens the game's own URL in a new tab.
+
+### 16.2 Flow
+1. A logged-in member opens `/submit`, pastes the game's URL and, optionally, its name and a note for Tyler.
+2. The server checks the URL (https only; public hosts only, never private or loopback addresses) and queues it.
+3. A headless Chromium in the server's container loads the page at desktop and phone width, waits for it to settle, and saves a screenshot as the card art. Whether the page fits a phone suggests the platform tag (U22).
+4. A short description (one-line pitch, ≤ 140 characters) is written from the page's text and screenshot.
+5. The submission waits in admin → **Submissions**. Tyler can edit the name, pitch, platform and art, re-take the screenshot, then **Approve** or **Decline**.
+6. Approved games appear as cartridges on the showcase and `/play`, credited "by <username>", with a Play button to the game's URL. Like the other games, the card is public and Play sits behind login (U7).
+7. The member sees each submission's status on `/me`.
+
+### 16.3 Limits *(agent)*
+- 5 submissions per member per day; one pending submission per URL.
+- Screenshots: 30 s page timeout, downloads blocked, images stored on the box and served by the server's own nginx site.
 
