@@ -54,7 +54,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 
 | # | Topic | Decision |
 |---|---|---|
-| U29 | Dice Arena cartridge | **GT-05**, open playtest at `https://dicearena.gametronyx.com` (its own address; gametronyx.com's DNS moved to Cloudflare with every record DNS only, so nothing else changed). Art: the Hollowmere castle-ruin arena banner. Mobile or desktop. Handoff off until Dice Arena redeems it (dicearena #7). Its feedback goes to `TylerBielman/dicearena` through Dice Arena's own bug-report path, so the admin feedback fields stay empty |
+| U29 | Dice Arena cartridge | **GT-05**, open playtest at `https://dicearena.gametronyx.com` (its own address; gametronyx.com's DNS moved to Cloudflare with every record DNS only, so nothing else changed). Art: the Hollowmere castle-ruin arena banner. Mobile or desktop. Handoff **on**: the API only makes an open playtest launchable (Play button, listed on /play) with handoff on; Dice Arena ignores the `#gtx_handoff` fragment until it redeems it (dicearena #7). Its feedback goes to `TylerBielman/dicearena` through Dice Arena's own bug-report path, so the admin feedback fields stay empty |
 
 ## Agent calls (for Tyler's review)
 
