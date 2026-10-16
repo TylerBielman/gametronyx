@@ -1,8 +1,8 @@
 import type { Game } from './api';
 
 // Shown if the API can't be reached, so the public showcase never renders
-// empty. Mirrors the games seeded by migration 0006; admin edits (M6) only
-// show up once the API answers.
+// empty. Mirrors the games seeded by migration 0006, plus Dice Arena (added in
+// admin, U29); admin edits (M6) only show up once the API answers.
 export const FALLBACK_GAMES: Game[] = [
   {
     slug: 'jerboa',
@@ -35,5 +35,15 @@ export const FALLBACK_GAMES: Game[] = [
     type: 'scheduled_playtest',
     site_url: null,
     launchable: false,
+  },
+  {
+    slug: 'dice-arena',
+    name: 'Dice Arena',
+    pitch: "Commit dice in secret, reveal at once, fire your hero's power. First to 7 VP. Play the bot or a friend.",
+    description: '',
+    art_url: null,
+    type: 'open_playtest',
+    site_url: null,
+    launchable: true,
   },
 ];

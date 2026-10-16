@@ -50,6 +50,12 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | U27 | Who adds external games | **Tyler only, in admin.** Friends send him their game's URL; he pastes it in (DESIGN §16) |
 | U28 | Card descriptions | **Free.** The site drafts the pitch from the game page's own text; Tyler edits and approves it. No paid AI model |
 
+## Tyler-approved (2026-10-16, Dice Arena)
+
+| # | Topic | Decision |
+|---|---|---|
+| U29 | Dice Arena cartridge | **GT-05**, open playtest at `https://dicearena.gametronyx.com` (its own address; gametronyx.com's DNS moved to Cloudflare with every record DNS only, so nothing else changed). Art: the Hollowmere castle-ruin arena banner. Mobile or desktop. Handoff off until Dice Arena redeems it (dicearena #7). Its feedback goes to `TylerBielman/dicearena` through Dice Arena's own bug-report path, so the admin feedback fields stay empty |
+
 ## Agent calls (for Tyler's review)
 
 | # | Call | Why |
