@@ -37,11 +37,22 @@ jobs:
       - name: HTTP
         if: ${{ !cancelled() }}
         run: |
-          probe() { echo "$1 → $(curl -sS -m 20 -o /dev/null -w '%{http_code} in %{time_total}s' "$1" 2>&1)"; }
+          # A 500 from the API carries no CORS headers, so the browser hides it and the site shows
+          # "Can't reach the Gametronyx server" even though the server answered.
+          probe() {
+            echo "== $*"
+            curl -sS -m 20 -D - -o body.txt -H 'Origin: https://gametronyx.com' "$@" 2>&1 \
+              | grep -iE '^(HTTP/|content-type|access-control-allow-origin)' || true
+            head -c 400 body.txt 2>/dev/null; echo
+          }
           probe https://api.gametronyx.com/api/games
           probe https://noeasywayup.com/api/games
+          probe https://api.gametronyx.com/api/auth/me
+          # A made-up player: the right answer is 401, never 500.
+          probe https://api.gametronyx.com/api/auth/login -d 'username=gtx-health-check&password=not-a-real-password'
+          probe https://noeasywayup.com/api/auth/login -d 'username=gtx-health-check&password=not-a-real-password'
           probe https://scores.gametronyx.com/api/leaderboards/health
-          probe https://gametronyx.com/
+          probe https://gametronyx.com/ -o /dev/null
       - name: CORS (the login request from gametronyx.com)
         if: ${{ !cancelled() }}
         run: |
