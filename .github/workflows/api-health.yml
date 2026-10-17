@@ -1,8 +1,9 @@
 name: Check the live servers
 
-# When the site says "Can't reach the Gametronyx server", the browser's request never got an
-# answer: DNS, the certificate, the server or CORS. This checks each from outside, the way a
-# player's browser sees it, and says which one is broken. Run it from the Actions tab.
+# When the site says "Can't reach the Gametronyx server", the browser's request got no answer it
+# could read: DNS, the certificate, CORS, or the API erroring. A 500 from the accounts API carries
+# no CORS headers, so the browser hides it and the site blames the player's connection. This checks
+# each from outside and goes red on the broken one. Run it from the Actions tab (DECISIONS A62).
 
 on:
   workflow_dispatch:
@@ -18,47 +19,43 @@ jobs:
     steps:
       - name: DNS
         run: |
-          dig +short NS gametronyx.com
-          for host in gametronyx.com www.gametronyx.com api.gametronyx.com scores.gametronyx.com noeasywayup.com; do
-            for resolver in 1.1.1.1 8.8.8.8; do
-              echo "$host @$resolver: $(dig +short A "$host" @"$resolver" | tr '\n' ' ')"
-            done
+          echo "nameservers: $(dig +short NS gametronyx.com | tr '\n' ' ')"
+          for host in gametronyx.com api.gametronyx.com scores.gametronyx.com; do
+            echo "$host: $(dig +short A "$host" @1.1.1.1 | tr '\n' ' ')"
           done
           [ -n "$(dig +short A api.gametronyx.com @1.1.1.1)" ] \
-            || { echo "::error::api.gametronyx.com has no DNS record, so no browser can reach the API"; exit 1; }
+            || { echo "::error::api.gametronyx.com has no DNS record"; exit 1; }
       - name: Certificates
         if: ${{ !cancelled() }}
         run: |
-          for host in api.gametronyx.com scores.gametronyx.com noeasywayup.com; do
-            echo "== $host"
+          for host in api.gametronyx.com scores.gametronyx.com; do
             echo | timeout 20 openssl s_client -connect "$host:443" -servername "$host" 2>/dev/null \
-              | openssl x509 -noout -subject -ext subjectAltName -enddate || echo "no certificate"
+              | openssl x509 -noout -subject -enddate -checkend 0 \
+              || { echo "::error::$host has no valid certificate"; exit 1; }
           done
-      - name: HTTP
+      - name: Accounts API
         if: ${{ !cancelled() }}
         run: |
-          # A 500 from the API carries no CORS headers, so the browser hides it and the site shows
-          # "Can't reach the Gametronyx server" even though the server answered.
-          probe() {
-            echo "== $*"
-            curl -sS -m 20 -D - -o body.txt -H 'Origin: https://gametronyx.com' "$@" 2>&1 \
-              | grep -iE '^(HTTP/|content-type|access-control-allow-origin)' || true
-            head -c 400 body.txt 2>/dev/null; echo
+          fail=0
+          probe() {  # probe <expected status> <curl args…>
+            want=$1; shift
+            got=$(curl -sS -m 20 -o body.txt -w '%{http_code}' -H 'Origin: https://gametronyx.com' "$@" || true)
+            echo "$got (want $want) $*: $(head -c 200 body.txt 2>/dev/null)"
+            [ "$got" = "$want" ] || { echo "::error::$* answered $got, not $want"; fail=1; }
           }
-          probe https://api.gametronyx.com/api/games
-          probe https://noeasywayup.com/api/games
-          probe https://api.gametronyx.com/api/auth/me
-          # A made-up player: the right answer is 401, never 500.
-          probe https://api.gametronyx.com/api/auth/login -d 'username=gtx-health-check&password=not-a-real-password'
-          probe https://noeasywayup.com/api/auth/login -d 'username=gtx-health-check&password=not-a-real-password'
-          probe https://scores.gametronyx.com/api/leaderboards/health
-          probe https://gametronyx.com/ -o /dev/null
-      - name: CORS (the login request from gametronyx.com)
+          probe 200 https://api.gametronyx.com/api/health
+          # These two read the player database; a 500 here is the API failing to reach Postgres.
+          probe 200 https://api.gametronyx.com/api/games
+          probe 401 https://api.gametronyx.com/api/auth/login -d 'username=gtx-health-check&password=not-a-real-password'
+          preflight=$(curl -sS -m 20 -o /dev/null -D - -X OPTIONS https://api.gametronyx.com/api/auth/login \
+            -H 'Origin: https://gametronyx.com' -H 'Access-Control-Request-Method: POST' \
+            -H 'Access-Control-Request-Headers: content-type' || true)
+          echo "$preflight" | grep -qi '^access-control-allow-origin: https://gametronyx.com' \
+            || { echo "::error::api.gametronyx.com doesn't allow https://gametronyx.com (CORS)"; fail=1; }
+          exit $fail
+      - name: Leaderboard server
         if: ${{ !cancelled() }}
         run: |
-          curl -sS -m 20 -o /dev/null -D - -X OPTIONS https://api.gametronyx.com/api/auth/login \
-            -H 'Origin: https://gametronyx.com' \
-            -H 'Access-Control-Request-Method: POST' \
-            -H 'Access-Control-Request-Headers: content-type' | tee headers.txt
-          grep -qi '^access-control-allow-origin: https://gametronyx.com' headers.txt \
-            || { echo "::error::api.gametronyx.com doesn't allow https://gametronyx.com (CORS)"; exit 1; }
+          got=$(curl -sS -m 20 -o /dev/null -w '%{http_code}' https://scores.gametronyx.com/api/leaderboards/health || true)
+          echo "scores.gametronyx.com health: $got"
+          [ "$got" = 200 ] || { echo "::error::scores.gametronyx.com health answered $got"; exit 1; }

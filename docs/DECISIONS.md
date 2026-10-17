@@ -121,6 +121,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | A59 | Screenshots come from a headless Chromium in the server's container, at desktop and phone width; public https URLs only | No third-party screenshot service and no cost; the URL check stops the server being pointed at private addresses |
 | A60 | External cartridges are public like the others, Play sits behind login (U7) and opens the game's own URL in a new tab | Same gate as today's games; there is no handoff to an external site |
 | A61 | Milestones are code: `.github/milestones.json`, synced by `.github/workflows/milestones.yml` on merge | Agents can't create milestones through the GitHub tools they have; the file also records the roadmap |
+| A62 | When the site says "Can't reach the Gametronyx server", run **Check the live servers** (`.github/workflows/api-health.yml`) from the Actions tab: it checks DNS, certificates, the accounts API's database-backed routes, login CORS and the leaderboard from outside, and goes red on the broken one. Manual only, no schedule | A 500 from the accounts API has no CORS headers, so browsers report it as a network failure; agents' sandboxes can't reach the box, but a runner can. No schedule keeps Actions minutes free (2026-10-17: login and `/api/games` answered 500 behind a healthy `/api/health`) |
 
 ## Open items
 None block the design. Values Tyler supplies at setup (DESIGN §12): the Discord server ID and invite, the bot token, the Resend key, the GitHub token, and the GoDaddy DNS records.
