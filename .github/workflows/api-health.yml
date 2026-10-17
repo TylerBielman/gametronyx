@@ -1,0 +1,53 @@
+name: Check the live servers
+
+# When the site says "Can't reach the Gametronyx server", the browser's request never got an
+# answer: DNS, the certificate, the server or CORS. This checks each from outside, the way a
+# player's browser sees it, and says which one is broken. Run it from the Actions tab.
+
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/api-health.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: DNS
+        run: |
+          dig +short NS gametronyx.com
+          for host in gametronyx.com www.gametronyx.com api.gametronyx.com scores.gametronyx.com noeasywayup.com; do
+            for resolver in 1.1.1.1 8.8.8.8; do
+              echo "$host @$resolver: $(dig +short A "$host" @"$resolver" | tr '\n' ' ')"
+            done
+          done
+          [ -n "$(dig +short A api.gametronyx.com @1.1.1.1)" ] \
+            || { echo "::error::api.gametronyx.com has no DNS record, so no browser can reach the API"; exit 1; }
+      - name: Certificates
+        if: ${{ !cancelled() }}
+        run: |
+          for host in api.gametronyx.com scores.gametronyx.com noeasywayup.com; do
+            echo "== $host"
+            echo | timeout 20 openssl s_client -connect "$host:443" -servername "$host" 2>/dev/null \
+              | openssl x509 -noout -subject -ext subjectAltName -enddate || echo "no certificate"
+          done
+      - name: HTTP
+        if: ${{ !cancelled() }}
+        run: |
+          probe() { echo "$1 → $(curl -sS -m 20 -o /dev/null -w '%{http_code} in %{time_total}s' "$1" 2>&1)"; }
+          probe https://api.gametronyx.com/api/games
+          probe https://noeasywayup.com/api/games
+          probe https://scores.gametronyx.com/api/leaderboards/health
+          probe https://gametronyx.com/
+      - name: CORS (the login request from gametronyx.com)
+        if: ${{ !cancelled() }}
+        run: |
+          curl -sS -m 20 -o /dev/null -D - -X OPTIONS https://api.gametronyx.com/api/auth/login \
+            -H 'Origin: https://gametronyx.com' \
+            -H 'Access-Control-Request-Method: POST' \
+            -H 'Access-Control-Request-Headers: content-type' | tee headers.txt
+          grep -qi '^access-control-allow-origin: https://gametronyx.com' headers.txt \
+            || { echo "::error::api.gametronyx.com doesn't allow https://gametronyx.com (CORS)"; exit 1; }
