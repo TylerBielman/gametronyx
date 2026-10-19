@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import Faux from '../components/Faux';
 import GameCard from '../components/GameCard';
 import Handheld from '../components/Handheld';
+import PlayButton from '../components/PlayButton';
 import { Spinner } from '../components/ui';
 import type { Game } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -22,12 +23,11 @@ const PLAYER_STEPS = [
 
 function CartridgeAction({ game, authed }: { game: Game; authed: boolean }) {
   if (game.type === 'open_playtest') {
-    return authed ? (
-      <Link to="/play" className="btn primary w-full">
-        Insert and play
-      </Link>
-    ) : (
-      <Link to="/login?next=%2Fplay" className="btn primary w-full">
+    // One press starts the game; no second pick on /play (A62).
+    if (!game.launchable) return null;
+    if (authed) return <PlayButton game={game} label="Insert and play" />;
+    return (
+      <Link to={`/login?next=${encodeURIComponent(`/play?launch=${game.slug}`)}`} className="btn primary w-full">
         Log in to play
       </Link>
     );

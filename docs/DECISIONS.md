@@ -121,6 +121,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | A59 | Screenshots come from a headless Chromium in the server's container, at desktop and phone width; public https URLs only | No third-party screenshot service and no cost; the URL check stops the server being pointed at private addresses |
 | A60 | External cartridges are public like the others, Play sits behind login (U7) and opens the game's own URL in a new tab | Same gate as today's games; there is no handoff to an external site |
 | A61 | Milestones are code: `.github/milestones.json`, synced by `.github/workflows/milestones.yml` on merge | Agents can't create milestones through the GitHub tools they have; the file also records the roadmap |
+| A62 | Issue #34: a cartridge's **Insert and play** on the showcase starts the game itself (the same handoff as `/play`), instead of opening `/play` to pick it again. Logged out, the game rides through login as `/play?launch=<slug>`, which starts it once and drops the parameter so Back doesn't relaunch. Open playtests with handoff off get no button, as on `/play` | Tyler: "Don't make me look at a different screen and pick again" |
 
 ## Open items
 None block the design. Values Tyler supplies at setup (DESIGN §12): the Discord server ID and invite, the bot token, the Resend key, the GitHub token, and the GoDaddy DNS records.
