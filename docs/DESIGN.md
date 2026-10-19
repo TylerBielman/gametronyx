@@ -142,7 +142,7 @@ The whole site is mobile-first, since most playtests happen on phones.
 ### 4.1 Public (not logged in)
 | Route | Content |
 |---|---|
-| `/` | **Showcase**. The GT-01 handheld (§4.4). Its A, B and ▶ keys are **Request invite**, **Log in** and **I have a code**. Operating instructions sit beside it. Game cartridges show art, name, one-line pitch and status ("Open playtest" / "Scheduled sessions" / "Coming soon"). Link-outs to Tyler's other sites are covered in §11. |
+| `/` | **Showcase**. The GT-01 handheld (§4.4). Its A, B and ▶ keys are **Request invite**, **Log in** and **I have a code**. Operating instructions sit beside it. Game cartridges show art, name, one-line pitch and status ("Open playtest" / "Scheduled sessions" / "Coming soon"). An open playtest's **Insert and play** starts the game in one press (§5.6 handoff); logged out, **Log in to play** goes to `/login` and then `/play?launch=<slug>`, which starts that game straight away (A62). Link-outs to Tyler's other sites are covered in §11. |
 | `/request-invite` | Form: name, email, "Which game are you interested in?" (optional), "Anything you'd like Tyler to know?" (optional). It has a hidden honeypot field and is rate-limited. The page then says "Thanks, Tyler will email you an invite code if there's room." |
 | `/join` | Step 1: invite code, prefilled from `/join#code=…` in an approved-invite email. Step 2: email, username, password and password confirmation, plus a line linking the privacy notice. It then logs the player in and goes to `/play`. |
 | `/login` | Username **or** email, plus password. Links to "Forgot password?" and "I have an invite code". |

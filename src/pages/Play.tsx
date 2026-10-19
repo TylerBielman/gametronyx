@@ -1,43 +1,11 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import GameCard from '../components/GameCard';
+import PlayButton from '../components/PlayButton';
 import { Notice, PageHeader, Spinner } from '../components/ui';
-import { api, ApiError, type Game } from '../lib/api';
+import { api, ApiError } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useGames } from '../lib/useGames';
-
-function PlayButton({ game }: { game: Game }) {
-  const { token } = useAuth();
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function launch() {
-    if (!token) return;
-    setBusy(true);
-    setError(null);
-    try {
-      // One-time handoff code, so the game can sign you in (DESIGN §5.6).
-      const { launch_url } = await api.handoff(token, game.slug);
-      window.location.assign(launch_url);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Couldn't start the game. Please try again.");
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="flex w-full flex-col gap-2">
-      <button type="button" className="btn primary w-full" onClick={launch} disabled={busy}>
-        {busy ? 'Launching…' : `Play ${game.name}`}
-      </button>
-      {error && (
-        <p role="alert" className="text-sm text-red-text">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
 
 function VerifyBanner() {
   const { user, token } = useAuth();
@@ -76,6 +44,13 @@ export default function Play() {
   const { games, loading, fromFallback } = useGames();
   const open = games.filter((g) => g.type === 'open_playtest' && g.launchable);
   const scheduled = games.filter((g) => g.type === 'scheduled_playtest');
+  // A game picked on the showcase before logging in starts right away (A62).
+  // Read once, then dropped from the address so Back from the game doesn't relaunch it.
+  const [params, setParams] = useSearchParams();
+  const [launch] = useState(() => params.get('launch'));
+  useEffect(() => {
+    if (params.has('launch')) setParams({}, { replace: true });
+  }, [params, setParams]);
 
   return (
     <>
@@ -94,7 +69,7 @@ export default function Play() {
             </h2>
             <div className="grid gap-6 sm:grid-cols-2">
               {open.map((g) => (
-                <GameCard key={g.slug} game={g} action={<PlayButton game={g} />} />
+                <GameCard key={g.slug} game={g} action={<PlayButton game={g} autoLaunch={!fromFallback && g.slug === launch} />} />
               ))}
             </div>
           </section>
