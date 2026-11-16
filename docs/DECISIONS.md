@@ -55,6 +55,7 @@ Tyler's answers and agent calls are kept apart. Agent calls are defaults Tyler c
 | # | Topic | Decision |
 |---|---|---|
 | U29 | Dice Arena cartridge | **GT-05**, open playtest at `https://dicearena.gametronyx.com` (its own address; gametronyx.com's DNS moved to Cloudflare with every record DNS only, so nothing else changed). Art: the Hollowmere castle-ruin arena banner. Mobile or desktop. Handoff **on**: the API only makes an open playtest launchable (Play button, listed on /play) with handoff on; Dice Arena ignores the `#gtx_handoff` fragment until it redeems it (dicearena #7). Its feedback goes to `TylerBielman/dicearena` through Dice Arena's own bug-report path, so the admin feedback fields stay empty |
+| U30 | Ash cartridge | **GT-06**, open playtest at `https://ash.gametronyx.com` for the Unity Fellowship judges (Tyler, 2026-11-16: not for the public, polished enough for judges). A Cloudflare Worker serving static files, like Dice Arena; the page carries noindex. **Desktop only** (mouse and keyboard RTS). Art: a greybox battle shot from build v17. Handoff **on** so it gets a Play button; Ash has no accounts and strips the `#gtx_handoff` fragment unread. Showcase visibility **off**, so only signed-in players see it on /play. Feedback goes to `TylerBielman/mythnow` (private) through Ash's own Worker, so the admin feedback fields stay empty |
 
 ## Agent calls (for Tyler's review)
 
