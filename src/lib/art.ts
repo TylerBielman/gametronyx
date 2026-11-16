@@ -4,6 +4,7 @@ export const DEFAULT_ART: Record<string, string> = {
   'no-easy-way-up': '/art/no-easy-way-up.webp',
   'red-ring': '/art/red-ring.webp',
   'dice-arena': '/art/dice-arena.webp',
+  ash: '/art/ash.webp',
 };
 
 // Catalogue numbers printed on each cartridge (GT-01 is the handheld itself).
@@ -12,6 +13,7 @@ export const CARTRIDGE_CODES: Record<string, string> = {
   'no-easy-way-up': 'GT-03',
   'red-ring': 'GT-04',
   'dice-arena': 'GT-05',
+  ash: 'GT-06',
 };
 
 // Where each game runs, shown on its cartridge (DECISIONS U22). A game not
@@ -22,6 +24,7 @@ export const PLATFORMS: Record<string, Platform> = {
   'no-easy-way-up': 'desktop',
   'red-ring': 'desktop',
   'dice-arena': 'mobile_desktop',
+  ash: 'desktop',
 };
 
 // Faux-Soviet lettering: plain English with Cyrillic look-alikes swapped in.
